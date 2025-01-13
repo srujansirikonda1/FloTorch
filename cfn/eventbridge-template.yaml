@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EventBridge Template for FloTorch'
+
+Parameters:
+  TableSuffix:
+    Type: String
+    Description: Suffix to append to resource names
+  EndpointCleanupLambdaArn:
+    Type: String
+    Description: ARN of the Lambda function to trigger for endpoint cleanup
+
+Resources:
+  EndpointCleanupRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Rule to trigger SageMaker endpoint cleanup Lambda function every hour"
+      ScheduleExpression: "rate(1 hour)"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt EndpointCleanupLambda.Arn
+          Id: "EndpointCleanupTarget"
+
+Outputs:
+  EndpointCleanupLambdaArn:
+    Description: ARN of the Endpoint Cleanup Lambda function
+    Value: !GetAtt EndpointCleanupLambda.Arn
+  EndpointCleanupRuleArn:
+    Description: ARN of the EventBridge rule for endpoint cleanup
+    Value: !GetAtt EndpointCleanupRule.Arn

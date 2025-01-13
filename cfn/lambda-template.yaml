@@ -549,6 +549,108 @@ Resources:
           s3_bucket: !Ref DataBucketName
           bedrock_limit_csv: seed/bedrock_limits_small.csv
 
+  EndpointCleanupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SageMakerEndpointCleanup
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sagemaker:ListEndpoints
+                  - sagemaker:DescribeEndpoint
+                  - sagemaker:DeleteEndpoint
+                  - sagemaker:DeleteEndpointConfig
+                  - cloudwatch:GetMetricStatistics
+                Resource: '*'
+
+  EndpointCleanupLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt EndpointCleanupLambdaRole.Arn
+      Code:
+        ZipFile: |
+          import boto3
+          import datetime
+          import time
+
+          def handler(event, context):
+              sagemaker = boto3.client('sagemaker')
+              cloudwatch = boto3.client('cloudwatch')
+              
+              # Get list of endpoints
+              endpoints = sagemaker.list_endpoints()
+              
+              for endpoint in endpoints['Endpoints']:
+                  endpoint_name = endpoint['EndpointName']
+                  
+                  # Get endpoint details including tags
+                  endpoint_details = sagemaker.describe_endpoint(EndpointName=endpoint_name)
+                  endpoint_arn = endpoint_details['EndpointArn']
+                  
+                  # Get tags for the endpoint
+                  tags_response = sagemaker.list_tags(ResourceArn=endpoint_arn)
+                  tags = {tag['Key']: tag['Value'] for tag in tags_response['Tags']}
+                  
+                  # Check if endpoint has required tags
+                  if tags.get('Project') == 'FloTorch':
+                      # Check invocation metrics for the last hour
+                      end_time = datetime.datetime.utcnow()
+                      start_time = end_time - datetime.timedelta(hours=1)
+                      
+                      metrics = cloudwatch.get_metric_statistics(
+                          Namespace='AWS/SageMaker',
+                          MetricName='Invocations',
+                          Dimensions=[{'Name': 'EndpointName', 'Value': endpoint_name}],
+                          StartTime=start_time,
+                          EndTime=end_time,
+                          Period=3600,
+                          Statistics=['Sum']
+                      )
+                      
+                      # If no invocations in the last hour, delete the endpoint
+                      if not metrics['Datapoints'] or metrics['Datapoints'][0]['Sum'] == 0:
+                          print(f"Deleting unused endpoint: {endpoint_name}")
+                          # Get endpoint config name before deleting endpoint
+                          endpoint_config_name = endpoint_details['EndpointConfigName']
+                          
+                          # Delete endpoint
+                          sagemaker.delete_endpoint(EndpointName=endpoint_name)
+                          
+                          # Wait for endpoint deletion to complete
+                          time.sleep(5)
+                          
+                          # Delete endpoint configuration
+                          sagemaker.delete_endpoint_config(EndpointConfigName=endpoint_config_name)
+              
+              return {
+                  'statusCode': 200,
+                  'body': 'Endpoint cleanup completed'
+              }
+      Runtime: python3.9
+      Timeout: 300
+      MemorySize: 128
+
+  EndpointCleanupLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EndpointCleanupLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt EndpointCleanupRule.Arn
+
 Outputs:
   RuntimeLambdaArn:
     Description: ARN of the Runtime Lambda function
@@ -556,6 +658,9 @@ Outputs:
   CostComputeLambdaArn:
     Description: ARN of the Cost Compute Lambda function
     Value: !GetAtt CostComputeLambda.Arn
+  EndpointCleanupLambdaArn:
+    Description: ARN of the Endpoint Cleanup Lambda function
+    Value: !GetAtt EndpointCleanupLambda.Arn
   LambdaRoleArn:
     Description: ARN of the Lambda execution role
     Value: !GetAtt LambdaExecutionRole.Arn
