@@ -214,14 +214,6 @@ Resources:
         EcrRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AppRepositoryURI
         AppImageTag: "1.6.0"
 
-  EventBridgeStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/templates/eventbridge-template.yaml
-      Parameters:
-        TableSuffix: !Ref TableSuffix
-        EndpointCleanupLambdaArn: !GetAtt LambdaStack.Outputs.EndpointCleanupLambdaArn
-
 Outputs:
   AppRunnerServiceUrl:
     Description: URL of the App Runner service
