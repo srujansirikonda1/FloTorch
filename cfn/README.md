@@ -72,7 +72,7 @@ The deployment requires the following AWS permissions:
 
 ## Getting Started
 
-1. Click on the [master template](https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=flotorch-stack&templateURL=https://flotorch-public.s3.us-east-1.amazonaws.com/templates/master-template.yaml) to open the CloudFormation console with the template pre-loaded.
+1. Click on the [master template (us-east-1)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create?stackName=flotorch-stack&templateURL=https://flotorch-public.s3.us-east-1.amazonaws.com/templates/master-template.yaml) to open the CloudFormation console with the template pre-loaded.
 
 2. In the CloudFormation console, fill in the parameters:
    - ProjectName: your-project-name
