@@ -473,12 +473,12 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "experiment_cost",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.experiment_cost ?? 0;
-      const b = rowB.original.experiment_cost ?? 0;
+      const a = rowA.original.cost ?? 0;
+      const b = rowB.original.cost ?? 0;
       return Number(a) - Number(b);
     },
     cell: ({ row }) => {
-      return row.original.experiment_cost? useHumanCurrencyAmount(row.original.experiment_cost) : "-"
+      return row.original.cost? useHumanCurrencyAmount(row.original.cost) : "-"
     }
   },
   {
@@ -574,7 +574,12 @@ const columnVisibility = ref({
         </UBadge>
       </template>
       <template #directional_pricing-cell="{row}">     
-        <ProjectExperimentDirectionalPricing :label="'Directional Pricing'" :pricing-info="row.original.config" :price="row.original.config?.directional_pricing ? row.original.config.directional_pricing : '-'" />
+      <div v-if="row.original.config?.directional_pricing">
+        <ProjectExperimentDirectionalPricing :label="'Directional Pricing'" :pricing-info="row.original.config" :price="row.original.config?.directional_pricing" />
+      </div>
+      <div v-else>
+      -
+      </div>
       </template>
     </UTable>
     <div v-if="hasAllExperimentsCompleted" class="flex justify-end">

@@ -122,10 +122,10 @@ const items = ref([
               <template v-else> No Action Taken </template>
             </template>
             <template #guardrail_result_assessment-cell="{ row }">
-              <template v-if="row.original.guardrail_result_assessment">
+              <template v-if="row.original.guardrail_output_assessment">
                 <ProjectExperimentAssessments
                   :label="'Result Assessment'"
-                  :assessments="row.original.guardrail_result_assessment"
+                  :assessments="row.original.guardrail_output_assessment"
                 />
               </template>
               <template v-else> No Action Taken </template>
@@ -199,7 +199,7 @@ const items = ref([
                   <td class="w-40">
                     {{ 
                       experimentsData?.indexing_time ? 
-                      useConvertSecondsToDHM(experimentsData?.indexing_time) 
+                      useConvertSecondsToDHM(Number(experimentsData?.indexing_time)) 
                       : 'Unable to fetch time'
                     }}
                   </td>
@@ -209,7 +209,7 @@ const items = ref([
                   <td>
                     {{
                       experimentsData?.retrieval_time ? 
-                      useConvertSecondsToDHM(experimentsData?.retrieval_time)
+                      useConvertSecondsToDHM(Number(experimentsData?.retrieval_time))
                       : 'Unable to fetch time'
                     }}
                   </td>
@@ -219,7 +219,7 @@ const items = ref([
                   <td >
                     {{ 
                       experimentsData?.eval_time ? 
-                      useConvertSecondsToDHM(experimentsData?.eval_time)
+                      useConvertSecondsToDHM(Number(experimentsData?.eval_time))
                       :'Unable to fetch time'
                     }}
                   </td>
