@@ -108,6 +108,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess
         - arn:aws:iam::aws:policy/AmazonOpenSearchIngestionFullAccess
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
       Policies:
         - PolicyName: LambdaVPCPolicy
           PolicyDocument:

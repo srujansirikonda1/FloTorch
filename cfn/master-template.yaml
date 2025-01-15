@@ -5,21 +5,21 @@ Parameters:
   ProjectName:
     Type: String
     Default: flotorch
-    Description: Name of the project
+    Description: "Name of the project. This will be used to prefix various resources for easy identification."
     
   TableSuffix:
     Type: String
-    Description: "A unique suffix to append to resource names in this Environment"
+    Description: "A unique suffix to append to resource names in this Environment. This ensures uniqueness across deployments."
     AllowedPattern: "^[a-z]+$"
-    ConstraintDescription: "Must contain only lowercase letters, only 6 characters long."
+    ConstraintDescription: "Must contain only lowercase letters, exactly 6 characters long."
     MaxLength: 6
     MinLength: 6
     
   ClientName:
     Type: String
     Default: "flotorch"
-    Description: "Client Name (must be lowercase)"
-    ConstraintDescription: "Must be one of the client name (lowercase)."
+    Description: "Client Name (must be lowercase). Used for tagging and naming resources specific to a client."
+    ConstraintDescription: "Must be lowercase, can include numbers and hyphens, between 3 and 20 characters."
     AllowedPattern: "^[a-z0-9-]+$"
     MaxLength: 20
     MinLength: 3
@@ -27,19 +27,19 @@ Parameters:
   CreatedBy:
     Type: String
     Default: "DevOpsTeam"
-    Description: "Created By"
+    Description: "Identifier for the team or individual creating this stack. Used for resource tagging and auditing."
 
   OpenSearchAdminUser:
     Type: String
     Default: "admin"
-    Description: "OpenSearch admin username"
+    Description: "Username for the OpenSearch admin account. This will be used to access and manage the OpenSearch cluster."
     MinLength: 1
 
   OpenSearchAdminPassword:
     Type: String
     Default: "Flotorch@123"
     NoEcho: true
-    Description: "OpenSearch admin password"
+    Description: "Password for the OpenSearch admin account. Must be strong and secure as it provides full access to the OpenSearch cluster."
     MinLength: 8
     MaxLength: 41
     ConstraintDescription: "Must be between 8 and 41 characters containing letters, numbers and symbols."
@@ -47,7 +47,7 @@ Parameters:
   NginxAuthPassword:
     Type: String
     NoEcho: true
-    Description: "Password for NGINX basic authentication"
+    Description: "Password for NGINX basic authentication. This secures access to the application's web interface."
     MinLength: 8
     MaxLength: 41
     ConstraintDescription: "Must be between 8 and 41 characters containing letters, numbers and symbols."
@@ -139,12 +139,12 @@ Resources:
         AiRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AIRepositoryURI
         PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1
         PrivateSubnet1: !GetAtt VPCStack.Outputs.PrivateSubnet1
-        IndexingImageTag: "1.6.0"
-        RetrieverImageTag: "1.6.0"
-        AppImageTag: "1.6.0"
-        EvaluationImageTag: "1.6.0"
-        RuntimeImageTag: "1.6.0"
-        AiImageTag: "1.6.0"
+        IndexingImageTag: "2.0.0"
+        RetrieverImageTag: "2.0.0"
+        AppImageTag: "2.0.0"
+        EvaluationImageTag: "2.0.0"
+        RuntimeImageTag: "2.0.0"
+        AiImageTag: "2.0.0"
 
   ECSStack:
     Type: AWS::CloudFormation::Stack
@@ -212,7 +212,7 @@ Resources:
         VpcConnectorArn: !GetAtt VPCStack.Outputs.VpcConnectorArn
         BedrockRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         EcrRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AppRepositoryURI
-        AppImageTag: "1.6.0"
+        AppImageTag: "2.0.0"
 
 Outputs:
   AppRunnerServiceUrl:
