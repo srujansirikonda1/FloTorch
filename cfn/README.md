@@ -1,23 +1,24 @@
 # FloTorch CloudFormation Templates
 
-This directory contains AWS CloudFormation templates for deploying the FloTorch infrastructure. The templates create a complete serverless architecture for managing and deploying machine learning models.
+This directory contains AWS CloudFormation templates for deploying the FloTorch infrastructure. The templates create a comprehensive architecture for managing and deploying machine learning models, combining serverless components with managed services like OpenSearch.
 
 ## Architecture Overview
 
 The infrastructure consists of several key components:
 
 - **VPC Stack**: Private network infrastructure
+- **VPC Endpoint Stack**: Secure access to AWS services within the VPC
 - **DynamoDB Stack**: Database tables and S3 bucket for data storage
 - **OpenSearch Stack**: Search functionality
 - **ECR Repository Stack**: Container image repositories
+- **ECS Stack**: Elastic Container Service for running containerized applications
 - **Lambda Stack**: Serverless functions for various operations
-- **EventBridge Stack**: Scheduled tasks for cleanup and maintenance
 - **State Machine Stack**: Step Functions for orchestration
 - **AppRunner Stack**: Application hosting and management
 
 ### Key Features
 
-1. Automated SageMaker endpoint cleanup
+1. Automated deployment and management
 2. Serverless architecture for cost optimization
 3. Secure VPC configuration
 4. Integrated monitoring and logging
@@ -39,7 +40,7 @@ The infrastructure consists of several key components:
 
 ## Required Permissions
 
-The deployment requires the following AWS permissions:
+The user doing the deployment requires administrative access(recommended) or the following AWS permissions:
 
 ```json
 {
@@ -76,11 +77,17 @@ The deployment requires the following AWS permissions:
 
 2. In the CloudFormation console, fill in the parameters:
    - ProjectName: your-project-name
+     Description: Name of the project (e.g., "flotorch")
    - TableSuffix: unique-suffix
+     Description: A unique 6-character lowercase suffix to append to resource names (e.g., "abcdef")
    - ClientName: your-client-name
+     Description: Lowercase name of the client (e.g., "acmecorp")
    - OpenSearchAdminUser: admin
+     Description: Username for OpenSearch admin access
    - OpenSearchAdminPassword: YourSecurePassword123!
+     Description: Secure password for OpenSearch admin (8-41 characters, including letters, numbers, and symbols)
    - NginxAuthPassword: YourNginxPassword123!
+     Description: Password for NGINX basic authentication (8-41 characters, including letters, numbers, and symbols)
 
 3. Review and create the stack, acknowledging that it may create IAM resources.
 
@@ -114,20 +121,10 @@ aws cloudformation create-stack \
   - Runtime operations
   - Cost computation
 
-### eventbridge-template.yaml
-- Manages scheduled tasks:
-  - Hourly SageMaker endpoint cleanup
-  - Other automated maintenance tasks
-
 ### vpc-template.yaml
 - Creates VPC and associated networking resources
 - Sets up public and private subnets
 - Configures route tables and internet gateway
-
-### iam-template.yaml
-- Defines IAM roles and policies
-- Creates service-linked roles for various AWS services
-- Manages cross-account access permissions
 
 ### dynamodb-template.yaml
 - Sets up DynamoDB tables for data storage
@@ -199,7 +196,12 @@ Note: These are approximate costs based on AWS pricing in the us-east-1 region. 
     - $0.004445 per GB-hour
     - Estimated cost: $2.00-$5.00/day (depending on task size and runtime)
 
-**Total Estimated Daily Cost**: $51.53-$65.69/day
+11. **Bedrock**:
+    - Input tokens: $0.0001 per 1K tokens
+    - Output tokens: $0.0002 per 1K tokens
+    - Estimated cost: $5.00-$10.00/day (assuming 25M-50M input tokens and 12.5M-25M output tokens)
+
+**Total Estimated Daily Cost**: $56.53-$75.69/day
 (Costs can vary significantly based on usage patterns and data volumes)
 
 ## Monitoring and Maintenance
@@ -246,6 +248,7 @@ For issues and support:
 1. Check CloudWatch logs
 2. Review stack events
 3. Contact DevOps team
+4. Reach out to us at info@flotorch.ai
 
 ## Contributing
 
