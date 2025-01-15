@@ -139,12 +139,12 @@ Resources:
         AiRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AIRepositoryURI
         PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1
         PrivateSubnet1: !GetAtt VPCStack.Outputs.PrivateSubnet1
-        IndexingImageTag: "1.6.0"
-        RetrieverImageTag: "1.6.0"
-        AppImageTag: "1.6.0"
-        EvaluationImageTag: "1.6.0"
-        RuntimeImageTag: "1.6.0"
-        AiImageTag: "1.6.0"
+        IndexingImageTag: "2.0.0"
+        RetrieverImageTag: "2.0.0"
+        AppImageTag: "2.0.0"
+        EvaluationImageTag: "2.0.0"
+        RuntimeImageTag: "2.0.0"
+        AiImageTag: "2.0.0"
 
   ECSStack:
     Type: AWS::CloudFormation::Stack
@@ -212,7 +212,7 @@ Resources:
         VpcConnectorArn: !GetAtt VPCStack.Outputs.VpcConnectorArn
         BedrockRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         EcrRepositoryUri: !GetAtt ECRRepositoryStack.Outputs.AppRepositoryURI
-        AppImageTag: "1.6.0"
+        AppImageTag: "2.0.0"
 
 Outputs:
   AppRunnerServiceUrl:
