@@ -37,6 +37,28 @@ The infrastructure consists of several key components:
    - DynamoDB tables
    - ECR repositories
    - AppRunner services
+4. Bedrock access to the following models:
+   - Embedding models:
+     - Amazon/amazon.titan-embed-text-v2:0
+     - Amazon/amazon.titan-embed-image-v1
+     - Cohere/cohere.embed-english-v3
+     - Cohere/cohere.embed-multilingual-v3
+   - Retrieval models:
+     - Amazon/amazon.titan-text-lite-v1
+     - Amazon/amazon.titan-text-express-v1
+     - Amazon/amazon.nova-lite-v1:0
+     - Amazon/amazon.nova-micro-v1:0
+     - Amazon/amazon.nova-pro-v1:0
+     - Anthropic/anthropic.claude-3-5-sonnet-20241022-v2:0
+     - Anthropic/anthropic.claude-3-5-sonnet-20240620-v1:0
+     - Cohere/cohere.command-r-plus-v1:0
+     - Cohere/cohere.command-r-v1:0
+     - Meta/meta.llama3-2-1b-instruct-v1:0
+     - Meta/meta.llama3-2-3b-instruct-v1:0
+     - Meta/meta.llama3-2-11b-instruct-v1:0
+     - Meta/meta.llama3-2-90b-instruct-v1:0
+     - Mistral AI/mistral.mistral-7b-instruct-v0:2
+     - Mistral AI/mistral.mistral-large-2402-v1:0
 
 ## Required Permissions
 
