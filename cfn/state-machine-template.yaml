@@ -1482,8 +1482,6 @@ Resources:
                           "aws_region.$": "$.parsedConfig.parsed_config.aws_region",
                           "embedding_model.$": "$.parsedConfig.parsed_config.embedding_model",
                           "retrieval_model.$": "$.parsedConfig.parsed_config.retrieval_model",
-                          "retrieval_model.$": "$.parsedConfig.parsed_config.retrieval_model",
-                          "retrieval_model.$": "$.parsedConfig.parsed_config.retrieval_model",
                           "embedding_service.$": "$.parsedConfig.parsed_config.embedding_service",
                           "retrieval_service.$": "$.parsedConfig.parsed_config.retrieval_service"
                         }
