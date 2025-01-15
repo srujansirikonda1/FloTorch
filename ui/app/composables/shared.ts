@@ -836,3 +836,10 @@ export const  useConvertSecondsToDHM = (seconds: number): string => {
   
   return `${paddedHours}:${paddedMinutes}:${formattedSeconds}`;
 }
+
+export const useConvertStringToNumber = (value: string | number) => {
+  if (typeof value === 'string') {
+    return Number(value);
+  }
+  return value;
+} 

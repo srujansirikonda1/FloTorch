@@ -284,10 +284,10 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     label: "Evaluation Embedding Model"
   },
   {
-    header: 'Evaluation Retrieval Model',
+    header: 'Evaluation Inferencing Model',
     enableHiding: true,
     accessorKey: "eval_retrieval_model",
-    label: "Evaluation Retrieval Model"
+    label: "Evaluation Inferencing Model"
   },
   {
     header: 'Directional Pricing',

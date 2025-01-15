@@ -375,7 +375,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
       return h(UButton, {
         color: "neutral",
         variant: "ghost",
-        label: "Evaluation Retrieval Model",
+        label: "Evaluation Inferencing Model",
         icon: isSorted
           ? isSorted === "asc"
             ? "i-lucide-arrow-up-narrow-wide"
@@ -385,7 +385,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       });
     },
-    label: 'Evaluation Retrieval Model',
+    label: 'Evaluation Inferencing Model',
     accessorKey: "config.eval_retrieval_model",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
@@ -478,7 +478,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
       return Number(a) - Number(b);
     },
     cell: ({ row }) => {
-      return row.original.cost? useHumanCurrencyAmount(row.original.cost) : "-"
+      return useHumanCurrencyAmount(useConvertStringToNumber(row.original.cost))
     }
   },
   {
