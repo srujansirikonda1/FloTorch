@@ -151,35 +151,35 @@ const items = ref([
             <table class="w-full">
               <tbody>
                 <tr>
-                  <td class="font-medium w-40">Indexing Cost Estimate</td>
+                  <td class="font-medium w-40">Indexing Cost</td>
                   <td class="w-40">
                     {{
-                      experimentsData?.config?.indexing_cost_estimate ?
+                      experimentsData?.indexing_cost ?
                       useHumanCurrencyAmount(
-                        experimentsData?.config?.indexing_cost_estimate
+                        experimentsData?.indexing_cost
                       ) : 'Unable to fetch data'
                     }}
                   </td>
                 </tr>
                 <tr>
-                  <td class="font-medium">Retrieval Cost Estimate</td>
+                  <td class="font-medium">Retrieval Cost</td>
                   <td>
                     {{
-                      experimentsData?.config?.retrieval_cost_estimate ? 
+                      experimentsData?.retrieval_cost ? 
                       useHumanCurrencyAmount(
-                        experimentsData?.config?.retrieval_cost_estimate
+                        experimentsData?.retrieval_cost
                       ) : 'Unable to fetch data'
                     }}
                   </td>
                 </tr>
                 <tr>
-                  <td class="font-medium">Evaluation Cost Estimate</td>
+                  <td class="font-medium">Evaluation Cost</td>
                   <td>
                   
                     {{
-                      experimentsData?.config?.eval_cost_estimate ? 
+                      experimentsData?.eval_cost ? 
                       useHumanCurrencyAmount(
-                        experimentsData?.config?.eval_cost_estimate
+                        experimentsData?.eval_cost
                       ) : 'Unable to fetch data'
                     }}
                   </td>
