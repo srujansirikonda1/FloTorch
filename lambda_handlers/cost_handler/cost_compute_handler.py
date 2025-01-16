@@ -2,10 +2,19 @@ import boto3
 import json
 import os
 from pricing import compute_actual_price, calculate_experiment_duration
+from decimal import Decimal
+import math
 
 import logging
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
+
+MILLION = 1_000_000
+THOUSAND = 1_000
+SECONDS_IN_MINUTE = 60
+MINUTES_IN_HOUR = 60
+HOURS_IN_DAY = 24
+DAYS_IN_MONTH = 30
 
 # Initialize AWS services clients
 dynamodb = boto3.resource("dynamodb")
@@ -69,30 +78,32 @@ def lambda_handler(event, context):
 
         if experiment_items:
             experiment = experiment_items[0]
-            total_duration, indexing_time, retrieval_time, eval_time = calculate_experiment_duration(experiment)
-
-            logger.info(f"Experiment {experiment_id} Total Time (in minutes): {total_duration} Indexing Time: {indexing_time}, Retrieval: {retrieval_time}, Evaluation: {eval_time}")
+            indexing_time, retrieval_time, eval_time = calculate_experiment_duration(experiment)
+            indexing_time_in_min = math.ceil(indexing_time / SECONDS_IN_MINUTE)
+            retrieval_time_in_min = math.ceil(retrieval_time / SECONDS_IN_MINUTE)
+            eval_time_in_min = math.ceil(eval_time / SECONDS_IN_MINUTE)
+            total_duration = indexing_time + retrieval_time + eval_time
+            total_duration_in_min = indexing_time_in_min + retrieval_time_in_min + eval_time_in_min
+            logger.info(f"Experiment {experiment_id} Total Time (in minutes): {total_duration_in_min} Indexing Time: {indexing_time_in_min}, Retrieval: {retrieval_time_in_min}, Evaluation: {eval_time_in_min}")
 
             total_index_embed_tokens = experiment.get("index_embed_tokens", 0)
             total_query_embed_tokens = experiment.get("retrieval_query_embed_tokens", 0)
             total_answer_input_tokens = experiment.get("retrieval_input_tokens", 0)
             total_answer_output_tokens = experiment.get("retrieval_output_tokens", 0)
 
-        # Compute total ECS time and cost
-        total_ecs_time = indexing_time + retrieval_time + eval_time
-        logger.info(f"Experiment {experiment_id} Total ECS Time : {total_ecs_time}")
-        total_embed_tokens = total_index_embed_tokens + total_query_embed_tokens
-
-        total_cost = compute_actual_price(
+        total_cost, indexing_cost, retrieval_cost, eval_cost = compute_actual_price(
             event,
             input_tokens=total_answer_input_tokens,
             output_tokens=total_answer_output_tokens,
-            embed_tokens=total_embed_tokens,
-            os_time=total_duration,
-            ecs_time=total_ecs_time,
+            index_embed_tokens=total_index_embed_tokens,
+            query_embed_tokens=total_query_embed_tokens,
+            total_time=total_duration_in_min,
+            indexing_time=indexing_time_in_min,
+            retrieval_time=retrieval_time_in_min,
+            eval_time=eval_time_in_min
         )
 
-        logger.info(f"Experiment {experiment_id} Actual Cost (in $): {total_cost}")
+        logger.info(f"Experiment {experiment_id} Actual Cost (in $): {total_cost}, Indexing: {indexing_cost}, Retrieval: {retrieval_cost}, Evaluation : {eval_cost}")
 
         # Update DynamoDB with the new cost
         if total_cost is None:
@@ -103,12 +114,16 @@ def lambda_handler(event, context):
             table = dynamodb.Table(experiment_table)
             table.update_item(
                 Key={"id": experiment_id},
-                UpdateExpression="SET cost = :new_cost, indexing_time = :new_indexing_time, retrieval_time = :new_retrieval_time, eval_time = :new_eval_time",
+                UpdateExpression="SET cost = :new_cost, indexing_time = :new_indexing_time, retrieval_time = :new_retrieval_time, eval_time = :new_eval_time, total_time = :new_total_time, indexing_cost = :new_indexing_cost, retrieval_cost = :new_retrieval_cost, eval_cost = :new_eval_cost",
                 ExpressionAttributeValues={
                     ":new_cost": str(total_cost),
-                    ":new_indexing_time": indexing_time,
-                    ":new_retrieval_time": retrieval_time,
-                    ":new_eval_time": eval_time,
+                    ":new_indexing_cost": str(indexing_cost),
+                    ":new_retrieval_cost": str(retrieval_cost),
+                    ":new_eval_cost": str(eval_cost),
+                    ":new_indexing_time": str(indexing_time),
+                    ":new_retrieval_time": str(retrieval_time),
+                    ":new_eval_time": str(eval_time),
+                    ":new_total_time": str(total_duration),
                 },
             )
         except Exception as e:

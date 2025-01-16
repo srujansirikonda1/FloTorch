@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
+import { v4 as uuidv4 } from 'uuid';
+
 const props = defineProps<{
   config?: Record<string, any>
 }>()
 
-import { v4 as uuidv4 } from 'uuid';
-
 const uuid = uuidv4()
 
 const currentStep = ref(1)
-const totalSteps = 3
+const totalSteps = 4
 
 const state = reactive<Partial<ProjectCreate>>({
   prestep: props.config?.prestep || undefined,
   indexing: props.config?.indexing || undefined,
-  retrieval: props.config?.retrieval || undefined
+  retrieval: props.config?.retrieval || undefined,
+  eval: props.config?.eval || undefined,
 })
 
 const isLastStep = computed(() => currentStep.value === totalSteps)
@@ -72,9 +73,19 @@ const nextStep = () => {
             label: pc.label
           }
         }),
-        rerank_model_id: state.retrieval?.rerank_model_id,
+        rerank_model_id: state.prestep?.region === 'us-east-1' ? ['none'] : state.retrieval?.rerank_model_id,
       },
-      n_shot_prompt_guide: state.retrieval?.n_shot_prompt_guide || {}
+      evaluation: {
+        evaluation: [
+          {
+            service: state.eval?.service,
+            embedding_model: state.eval?.ragas_embedding_llm,
+            retrieval_model: state.eval?.ragas_inference_llm,
+          }
+        ],
+      },
+      n_shot_prompt_guide: state.retrieval?.n_shot_prompt_guide || {},
+      guardrails: state.eval?.guardrails
     }
     mutate(submitData)
   } else {
@@ -93,7 +104,8 @@ const kbFilesUploadedData = ref();
 const steps = [
   { label: 'Data Strategy', icon: 'i-lucide-square-stack' },
   { label: 'Indexing Strategy', icon: 'i-lucide-layers' },
-  { label: 'Retrieval Strategy', icon: 'i-lucide-file-search' }
+  { label: 'Retrieval Strategy', icon: 'i-lucide-file-search' },
+  { label: 'Guardrails and Evaluation', icon: 'i-lucide-search' }
 ]
 </script>
 
@@ -103,13 +115,13 @@ const steps = [
   <div>
     <div class="relative my-8">
       <!-- Progress bar -->
-      <div class="absolute top-6 left-14 right-14 h-[2px] bg-gray-200">
+      <div class="absolute top-6 left-16 right-25 h-[2px] bg-gray-200">
         <div class="h-full bg-gray-600 transition-all duration-300 ease-in-out"
           :style="{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }" />
       </div>
 
       <!-- Steps -->
-      <div class="relative flex justify-between px-4">
+      <div class="relative flex justify-between px-1 w-full">
         <div v-for="(step, index) in steps" :key="index" class="flex flex-col items-center gap-2"
           :class="{ 'text-gray-900': currentStep > index || currentStep === index + 1, 'text-gray-400': currentStep < index + 1 }">
           <div
@@ -132,8 +144,10 @@ const steps = [
       <ProjectCreateIndexingStrategyStep v-model="state.indexing" @previous="previousStep" @next="nextStep" />
     </div>
     <div v-if="currentStep === 3">
-      <ProjectCreateRetrievalStrategyStep :region="state.prestep?.region" v-model="state.retrieval" next-button-label="Submit" @previous="previousStep"
-        @next="nextStep" />
+      <ProjectCreateRetrievalStrategyStep :region="state.prestep?.region" v-model="state.retrieval" @next="nextStep" @previous="previousStep" />
+    </div>
+    <div v-if="currentStep === 4">
+      <ProjectCreateEvalStrategyStep :region="state.prestep?.region" :inferenceModel="state.retrieval?.retrieval?.map(model => model.value)" :embeddingModel="state.indexing?.embedding?.map(model => model.value)" v-model="state.eval" @previous="previousStep" @next="nextStep" next-button-label="Submit" />
     </div>
   </div>
 </template>

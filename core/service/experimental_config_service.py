@@ -70,9 +70,19 @@ class ExperimentalConfigService:
             kb_data=exp_config_data.get('kb_data', {}),
             n_shot_prompts=exp_config_data.get('n_shot_prompts', 0),
             indexing_algorithm=exp_config_data.get('indexing_algorithm'),
-            rerank_model_id=exp_config_data.get('rerank_model_id', "none")
+            rerank_model_id=exp_config_data.get('rerank_model_id', "none"),
+            # TODO: change this class to read everything from exp_config retrieved from DynamoDB
+            enable_guardrails=experiment.get('config').get('enable_guardrails', False),
+            guardrail_id=experiment.get('config').get('guardrail_id', ""),
+            guardrail_version=experiment.get('config').get('guardrail_version', ""),
+            enable_prompt_guardrails=experiment.get('config').get("enable_prompt_guardrails", False),
+            enable_context_guardrails=experiment.get('config').get("enable_context_guardrails", False),
+            enable_response_guardrails=experiment.get('config').get("enable_response_guardrails", False),
+            eval_service=exp_config_data.get('eval_service', "ragas"),
+            eval_embedding_model=exp_config_data.get('eval_embedding_model', "amazon.titan-embed-text-v1"),
+            eval_retrieval_model=exp_config_data.get('eval_retrieval_model', "mistral.mixtral-8x7b-instruct-v0:1"),
         )
-        
+
         n_shot_prompt_guide = experiment.get('config').get('n_shot_prompt_guide')
         if not n_shot_prompt_guide:
             raise ValueError(f"Experiment {experiment_id}: Missing prompt file")
