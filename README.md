@@ -2,10 +2,6 @@
 
 FloTorch.ai is an innovative product poised to transform the field of Generative AI by simplifying and optimizing the decision-making process for leveraging Large Language Models (LLMs) in Retrieval Augmented Generation (RAG) systems. In today’s fast-paced digital landscape, selecting the right LLM setup is critical for achieving efficiency, accuracy, and cost-effectiveness. However, this process often involves extensive trial-and-error, significant resource expenditure, and complex comparisons of performance metrics. Our solution addresses these challenges with a streamlined, user-friendly approach.
 
-## Demo
-
-[![FloTorch.ai Demo](./cover-image.png?raw=true)](https://fissiontorch-public.s3.us-east-1.amazonaws.com/demo.mp4)
-
 ## Key Features
 
 - **Automated Evaluation of LLMs**: FloTorch.ai evaluates multiple LLMs by analyzing combinations of hyperparameters defined by the end user.
@@ -37,6 +33,10 @@ By combining advanced evaluation capabilities with a focus on cost and time effi
 With FloTorch.ai, we aim to be a pivotal enabler of progress in the generative AI ecosystem, helping our users achieve excellence in their projects.
 
 # Using FloTorch
+
+## Demo
+
+[![FloTorch.ai Demo](./cover-image.png?raw=true)](https://fissiontorch-public.s3.us-east-1.amazonaws.com/demo.mp4)
 
 ## Installation guide
 
