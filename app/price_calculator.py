@@ -119,14 +119,14 @@ def estimate_times(no_of_kb_tokens, num_prompts, configuration):
     # For every 50,000 tokens of kb data and 50 prompts of gt data, estimated time in mins
     estimated_time = {
         "indexing": {"sagemaker" : 2, "bedrock" : 1},
-        "retrieval": {"sagemaker": 3, "bedrock": 2},
-        "eval": {"sagemaker": 7, "bedrock": 6}
+        "retrieval": {"sagemaker": 3, "bedrock": 3},
+        "eval": {"sagemaker": 13, "bedrock": 12}
     }
     indexing_service = configuration['embedding_service']
     retrieval_service = configuration['retrieval_service']
     
     indexing_time = (no_of_kb_tokens/ 50000) * estimated_time['indexing'][indexing_service]
-    retrieval_time = (num_prompts / 50) * estimated_time['retrieval'][retrieval_service]
-    eval_time = (num_prompts / 50) * estimated_time['eval'][retrieval_service]
+    retrieval_time = (num_prompts / 25) * estimated_time['retrieval'][retrieval_service]
+    eval_time = (num_prompts / 25) * estimated_time['eval'][retrieval_service]
 
     return indexing_time, retrieval_time, eval_time
