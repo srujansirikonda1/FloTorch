@@ -51,10 +51,6 @@ Click [here](faq.md) for frequently asked questions.
 
 This document outlines the guidelines for contributing to the project to maintain consistency and code quality.
 
-### Adding an Embedding Model or Inference Model
-
-Follow the detailed steps provided in [instructions.md](./instructions.md).
-
 ### Master Branch
 
 - The `master` branch is the primary branch and should remain stable.
