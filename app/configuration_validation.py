@@ -263,13 +263,14 @@ def generate_all_combinations(data):
             valid_configurations.append(configuration)
 
     if len(valid_configurations) > 0:
-        effective_num_tokens_kb_data = estimate_effective_kb_tokens(configuration, num_tokens_kb_data)
-        indexing_time, retrieval_time, eval_time = estimate_times(effective_num_tokens_kb_data, num_prompts, configuration)
         for configuration in valid_configurations:
             configuration["directional_pricing"] = 0
             configuration["indexing_cost_estimate"] = 0 
             configuration["retrieval_cost_estimate"] = 0 
             configuration["eval_cost_estimate"] = 0
+            
+            effective_num_tokens_kb_data = estimate_effective_kb_tokens(configuration, num_tokens_kb_data)
+            indexing_time, retrieval_time, eval_time = estimate_times(effective_num_tokens_kb_data, num_prompts, configuration)
 
             if configuration['embedding_service'] == "bedrock" :
                 embedding_price = estimate_embedding_model_bedrock_price(bedrock_price_df, configuration, num_tokens_kb_data)
