@@ -799,11 +799,13 @@ export const useHumanIndexingAlgorithm = (algorithm: string) => {
   }
 };
 
-export const useHumanCurrencyAmount = (amount: number) => {
+export const useHumanCurrencyAmount = (amount: number, decimalPlaces: number = 3) => {
   
   return Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
   }).format(amount);
 };
 
@@ -836,3 +838,10 @@ export const  useConvertSecondsToDHM = (seconds: number): string => {
   
   return `${paddedHours}:${paddedMinutes}:${formattedSeconds}`;
 }
+
+export const useConvertStringToNumber = (value: string | number) => {
+  if (typeof value === 'string') {
+    return Number(value);
+  }
+  return value;
+} 

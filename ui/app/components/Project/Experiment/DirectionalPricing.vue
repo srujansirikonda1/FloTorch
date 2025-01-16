@@ -18,17 +18,16 @@
         <UCard>
             <table class="w-full text-left">
               <tbody>
-               
                  <tr>
-                  <td class="font-medium">Indexing Cost Estimate</td>
+                  <td class="font-medium">Indexing Cost</td>
                   <td>{{ props?.pricingInfo?.indexing_cost_estimate ? useHumanCurrencyAmount(props?.pricingInfo?.indexing_cost_estimate) : 'Unable to fetch the data'}}</td>
                 </tr>
                  <tr>
-                  <td class="font-medium">Retrieval Cost Estimate</td>
+                  <td class="font-medium">Retrieval Cost</td>
                   <td>{{ props?.pricingInfo?.retrieval_cost_estimate ? useHumanCurrencyAmount(props?.pricingInfo?.retrieval_cost_estimate) : 'Unable to fetch the data'}}</td>
                 </tr>
                  <tr>
-                  <td class="font-medium">Evaluation Cost Estimate</td>
+                  <td class="font-medium">Evaluation Cost</td>
                   <td> {{ props?.pricingInfo?.eval_cost_estimate ? useHumanCurrencyAmount(props?.pricingInfo?.eval_cost_estimate) : 'Unable to fetch the data'}}</td>
                 </tr>
               </tbody>
