@@ -574,16 +574,35 @@ const columnVisibility = ref({
         </UBadge>
       </template>
       <template #directional_pricing-cell="{row}">     
-      <div v-if="row.original.config?.directional_pricing">
-        <ProjectExperimentDirectionalPricing :label="'Directional Pricing'" :pricing-info="row.original.config" :price="row.original.config?.directional_pricing" />
-      </div>
-      <div v-else>
-      -
-      </div>
+        <div class="w-full">
+            <UTooltip   :content="{side: 'right'}">
+                    <a class="text-blue-500 hover:underline" href="#">{{row.original?.config?.directional_pricing}}</a>
+                    <template #content>
+                      <UCard class="w-full">
+                        <table class="w-full">
+                          <tbody>
+                            <tr>
+                              <td>Indexing Cost Estimate:</td>
+                              <td>{{useHumanCurrencyAmount(row.original?.config?.indexing_cost_estimate,3)}}</td>
+                            </tr>
+                            <tr>
+                              <td>Retrieval Cost Estimate:</td>
+                              <td>{{useHumanCurrencyAmount(row.original?.config?.retrieval_cost_estimate,3)}}</td>
+                            </tr>
+                            <tr>
+                              <td>Evaluation Cost Estimate:</td>
+                              <td>{{useHumanCurrencyAmount(row.original?.config?.eval_cost_estimate,3)}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </UCard>
+                  </template>
+            </UTooltip>
+          </div>
       </template>
     </UTable>
     <div v-if="hasAllExperimentsCompleted" class="flex justify-end">
-      <DownloadResultsButton :results="experiments" button-label="Download Results" />
+      <DownloadResultsButton :results="experiments" :question-metrics="false" button-label="Download Results" />
     </div>
   </div>
 </template>
