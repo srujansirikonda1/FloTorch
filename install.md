@@ -2,6 +2,16 @@
 
 This directory contains AWS CloudFormation templates for deploying the FloTorch infrastructure. The templates create a comprehensive architecture for managing and deploying machine learning models, combining serverless components with managed services like OpenSearch.
 
+## Subscription Steps
+
+Before deploying the FloTorch infrastructure, you need to subscribe to the FloTorch product on AWS Marketplace:
+
+1. Visit the [FloTorch AWS Marketplace page](https://aws.amazon.com/marketplace/pp/prodview-z5zcvloh7l3ky?ref_=aws-mp-console-subscription-detail-payg).
+2. Click on the "View Purchase options" button and once its shown that you've subscribed, then click on 'Continue to Configuration' button.
+3. The select the fulfilment option and the Software Version you want to use
+
+The CloudFormation templates in this directory will automatically use your FloTorch subscription to set up the required resources and services.
+
 ## Architecture Overview
 
 The infrastructure consists of several key components:
@@ -95,7 +105,7 @@ The user doing the deployment requires administrative access(recommended) or the
 
 ## Getting Started
 
-1. Click on the [master template (us-east-1)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create?stackName=flotorch-stack&templateURL=https://flotorch-public.s3.us-east-1.amazonaws.com/templates/master-template.yaml) to open the CloudFormation console with the template pre-loaded.
+1. Click on the [master template (us-east-1)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create?stackName=flotorch-stack&templateURL=https://flotorch-public.s3.us-east-1.amazonaws.com/2.0.0/templates/master-template.yaml) to open the CloudFormation console with the template pre-loaded.
 
 2. In the CloudFormation console, fill in the parameters:
    - ProjectName: your-project-name
