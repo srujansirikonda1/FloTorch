@@ -284,10 +284,10 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     label: "Evaluation Embedding Model"
   },
   {
-    header: 'Evaluation Retrieval Model',
+    header: 'Evaluation Inferencing Model',
     enableHiding: true,
     accessorKey: "eval_retrieval_model",
-    label: "Evaluation Retrieval Model"
+    label: "Evaluation Inferencing Model"
   },
   {
     header: 'Directional Pricing',
@@ -345,8 +345,6 @@ const columnVisibility = ref({
   eval_retrieval_model: false,
   eval_embedding_model: false,
   eval_service:false,
-  n_shot_prompts: false,
-  knn_num: false,
   indexing_algorithm: false,
   temp_retrieval_llm: false,
 })
@@ -394,16 +392,31 @@ const columnVisibility = ref({
         </UButton>
       </template>
       <template #directional_pricing-cell="{ row }">
-        <div class="flex justify-center" v-if="row.original.directional_pricing">
-          <ProjectExperimentDirectionalPricing :label="'Directional Pricing'" :pricing-info="{
-            retrieval_cost_estimate : row.original?.retrieval_cost_estimate,
-            indexing_cost_estimate : row.original?.indexing_cost_estimate,
-            eval_cost_estimate : row.original?.eval_cost_estimate
-          }" :price="row.original.directional_pricing" />
-          </div>
-          <div v-else>
-             - 
-          </div>
+        <div class="w-full">
+              <UTooltip   :content="{side: 'right'}">
+                <a class="text-blue-500 hover:underline" href="#">{{row.original.directional_pricing}}</a>
+                <template #content>
+                  <UCard class="w-full">
+                    <table class="w-full">
+                      <tbody>
+                        <tr>
+                          <td>Indexing Cost Estimate:</td>
+                          <td>{{useHumanCurrencyAmount(row.original.indexing_cost_estimate,3)}}</td>
+                        </tr>
+                        <tr>
+                          <td>Retrieval Cost Estimate:</td>
+                          <td>{{useHumanCurrencyAmount(row.original.retrieval_cost_estimate,3)}}</td>
+                        </tr>
+                        <tr>
+                          <td>Evaluation Cost Estimate:</td>
+                          <td>{{useHumanCurrencyAmount(row.original.eval_cost_estimate,3)}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </UCard>
+              </template>
+              </UTooltip>
+        </div>
       </template>
       <template #chunk_overlap-header="{ column }">
         <UButton
@@ -512,15 +525,6 @@ const columnVisibility = ref({
       <template #retrieval_model-cell="{ row }">
         {{ useModelName("retrieval", row.original.retrieval_model) }}
       </template>
-       <!-- <template #eval_cost_estimate-cell="{ row }">
-        {{ useHumanCurrencyAmount(row.original.eval_cost_estimate) }}
-      </template>
-       <template #indexing_cost_estimate-cell="{ row }">
-        {{ useHumanCurrencyAmount(row.original.indexing_cost_estimate) }}
-      </template>
-       <template #retrieval_cost_estimate-cell="{ row }">
-        {{ useHumanCurrencyAmount(row.original.retrieval_cost_estimate) }}
-      </template> -->
     </UTable>
   </div>
 </template>

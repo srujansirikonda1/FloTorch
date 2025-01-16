@@ -12,6 +12,8 @@ export const ProjectCreateModelSchema = z.object({
   service: z.string(),
   value: z.string(),
   label: z.string(),
+  type: z.string().optional().nullable(),
+  model_name: z.string().optional().nullable(),
 });
 
 export const ProjectCreateDataStrategySchema = z.object({

@@ -91,7 +91,7 @@ def estimate_fargate_price(total_time, vpc=8, mem=16):
     fargate_cpu_price = fargate_cpu * vpc
     fargate_mem_price = fargate_mem * mem
 
-    fargate_price = (fargate_cpu_price + fargate_mem_price) * total_time / 3600
+    fargate_price = (fargate_cpu_price + fargate_mem_price) * total_time / 60
     return fargate_price
     
 def estimate_opensearch_price(time):
@@ -99,12 +99,13 @@ def estimate_opensearch_price(time):
     num_instance = 3
     instance_price =  opensearch_instance_cost_per_hour * num_instance #per hour
     ebs_volume_size = 2
+    ebs_volume_size = 10
     ebs_volume_price = .122
     ebs_price = ebs_volume_price * ebs_volume_size * num_instance /30 /24 #3 instances for 2GB per hour
     iops_price_per_hour = 13000  # instances per hour for 16000 IOPS (3000 free)
     iops_price = iops_price_per_hour * .008 * num_instance /30/ 24 #3 instances
     
-    total_price = ((instance_price + ebs_price + iops_price) * time / 3600)  #price per experiment
+    total_price = ((instance_price + ebs_price + iops_price) * time / 60)  #price per experiment
 
     return total_price
 

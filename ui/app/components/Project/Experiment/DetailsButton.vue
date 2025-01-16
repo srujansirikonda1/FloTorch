@@ -88,7 +88,7 @@ const props = defineProps<{
             </td>
           </tr>
           <tr v-if="props.experimentsData?.config?.eval_retrieval_model">
-            <td class="font-medium">Evaluation retrieval model</td>
+            <td class="font-medium">Evaluation Inferencing Model</td>
             <td> {{props.experimentsData?.config?.eval_retrieval_model}}
             </td>
           </tr>
