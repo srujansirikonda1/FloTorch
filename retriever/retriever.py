@@ -193,8 +193,6 @@ def process_questions(
             guardrail_id = None
             guardrail_blocked = None
 
-            retrieval_input_tokens = 0
-            retrieval_output_tokens = 0
             answer_metadata = {}
             answer = ""
 
