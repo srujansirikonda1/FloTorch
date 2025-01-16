@@ -532,7 +532,7 @@ Resources:
       Runtime: python3.9
       Code:
         S3Bucket: flotorch-public
-        S3Key: lambda/cost_compute_lambda.zip
+        S3Key: !Sub ${AppImageTag}/lambda/cost_compute_lambda.zip
       Handler: cost_compute_handler.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       VpcConfig:
