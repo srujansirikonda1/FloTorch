@@ -170,7 +170,7 @@ def ecs_cost(time):
     fargate_cpu_total_cost = fargate_cpu_cost_per_vcpu * vCPU
     fargate_memory_total_cost = fargate_memory_cost_per_gb * memory
 
-    overall_cost = fargate_cpu_total_cost + fargate_memory_total_cost * (time / MINUTES_IN_HOUR)
+    overall_cost = (fargate_cpu_total_cost + fargate_memory_total_cost) * (time / MINUTES_IN_HOUR)
     return overall_cost
 
 def calculate_experiment_duration(experiment):
