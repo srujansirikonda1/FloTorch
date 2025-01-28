@@ -75,7 +75,20 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     },
     enableHiding: true,
     accessorKey: "chunking_strategy",
-    label: "Chunking"
+    label: "Chunking",
+    sortingFn: (rowA, rowB) => {
+      const getChunkingValue = (row: any) => {
+        const strategy = useHumanChunkingStrategy(row.chunking_strategy);
+        if (strategy === 'Hierarchical') {
+          return `${row.hierarchical_child_chunk_size}-${row.hierarchical_parent_chunk_size}`;
+        }
+        return strategy;
+      };
+      
+      const a = getChunkingValue(rowA.original);
+      const b = getChunkingValue(rowB.original);
+      return a.localeCompare(b);
+    }
   },
   {
     header: ({ column }) => {
@@ -95,13 +108,56 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     },
     enableHiding: true,
     accessorKey: "chunk_size",
-    label: "Chunk Size"
+    label: "Chunk Size",
+    sortingFn: (rowA, rowB) => {
+      const getChunkSizeValue = (row: any) => {
+        const strategy = useHumanChunkingStrategy(row.chunking_strategy);
+        if (strategy === 'Hierarchical') {
+          // For hierarchical, create a composite value using both sizes
+          const childSize = Number(row.hierarchical_child_chunk_size ?? 0);
+          const parentSize = Number(row.hierarchical_parent_chunk_size ?? 0);
+          // Multiply parent by 1000 to ensure it takes precedence in sorting
+          return (parentSize * 1000) + childSize;
+        }
+        return Number(row.chunk_size ?? 0);
+      };
+
+      const a = getChunkSizeValue(rowA.original);
+      const b = getChunkSizeValue(rowB.original);
+      return a - b;
+    }
   },
   {
-    header: 'Chunk Overlap Percentage',
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Chunk Overlap Percentage",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
     enableHiding: true,
     accessorKey: "chunk_overlap",
     label: "Chunk Overlap Percentage",
+    sortingFn: (rowA, rowB) => {
+      const getOverlapValue = (row: any) => {
+        const strategy = useHumanChunkingStrategy(row.chunking_strategy);
+        return strategy === 'Fixed' 
+          ? Number(row.chunk_overlap ?? 0)
+          : Number(row.hierarchical_chunk_overlap_percentage ?? 0);
+      };
+      
+      const a = getOverlapValue(rowA.original);
+      const b = getOverlapValue(rowB.original);
+      return a - b;
+    }
   },
   {
     header: ({ column }) => {
@@ -284,16 +340,30 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     label: "Evaluation Embedding Model"
   },
   {
-    header: 'Evaluation Inferencing Model',
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Evaluation Inferencing Model",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
     enableHiding: true,
     accessorKey: "eval_retrieval_model",
     label: "Evaluation Inferencing Model"
   },
   {
-    header: 'Directional Pricing',
+    header: 'Directional Cost',
     enableHiding: true,
     accessorKey: "directional_pricing",
-    label: "Directional Pricing"
+    label: "Directional Cost"
   },
   {
     header: ({ column }) => {
@@ -334,6 +404,49 @@ const columns = ref<TableColumn<ValidExperiment>[]>([
     enableHiding: true,
     accessorKey: "rerank_model_id",
     label: "Reranking Model"
+  },
+  {
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Guardrail",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    enableHiding: true,
+    accessorKey: "guardrail_name",
+    label: "Guardrail",
+    cell: ({ row }) => {
+      return row.original.guardrail_name || 'NA';
+    }
+  },
+  {
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Bedrock Kb Name",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    enableHiding: true,
+    accessorKey: "kb_name",
+    label: "Bedrock Kb Name"
   }
 ])
 
@@ -374,6 +487,12 @@ const columnVisibility = ref({
     </div>
     <UTable class="h-100" sticky ref="table" v-model:column-visibility="columnVisibility" :columns="columns" :data="experiments"
       :loading="isLoading">
+      <template #empty>
+        <div class="flex flex-col items-center justify-center py-6">
+          <p v-if="isLoading" class="text-gray-500">Please wait, we are fetching valid experiments...!</p>
+          <p v-else>No valid experiments are found...!</p>
+        </div>
+      </template>
       <template #directional_pricing-header="{ column }">
         <UButton
           color="neutral"
@@ -394,7 +513,7 @@ const columnVisibility = ref({
       <template #directional_pricing-cell="{ row }">
         <div class="w-full">
               <UTooltip   :content="{side: 'right'}">
-                <a class="text-blue-500 hover:underline" href="#">{{row.original.directional_pricing}}</a>
+                <a class="text-blue-500 hover:underline" href="#">{{useHumanCurrencyAmount(row.original.directional_pricing)}}</a>
                 <template #content>
                   <UCard class="w-full">
                     <table class="w-full">
@@ -408,9 +527,14 @@ const columnVisibility = ref({
                           <td>{{useHumanCurrencyAmount(row.original.retrieval_cost_estimate,3)}}</td>
                         </tr>
                         <tr>
+                          <td>Inferencing Cost Estimate:</td>
+                          <td>{{useHumanCurrencyAmount(row.original.inferencing_cost_estimate,3)}}</td>
+                        </tr>
+                        <tr>
                           <td>Evaluation Cost Estimate:</td>
                           <td>{{useHumanCurrencyAmount(row.original.eval_cost_estimate,3)}}</td>
                         </tr>
+                         
                       </tbody>
                     </table>
                   </UCard>
@@ -418,7 +542,7 @@ const columnVisibility = ref({
               </UTooltip>
         </div>
       </template>
-      <template #chunk_overlap-header="{ column }">
+      <!-- <template #chunk_overlap-header="{ column }">
         <UButton
           color="neutral"
           variant="ghost"
@@ -436,7 +560,7 @@ const columnVisibility = ref({
           </span>
         </template>
       </UButton>
-      </template>
+      </template> -->
       <template #vector_dimension-header="{ column }">
         <UButton
           color="neutral"
@@ -455,8 +579,8 @@ const columnVisibility = ref({
         </UButton>
       </template>
       <template #vector_dimension-cell="{ row }">
-        <span class="flex justify-center">
-          {{ row.original.vector_dimension }}
+        <span class=" ">
+          {{ row.original.vector_dimension || 'NA' }}
         </span>
       </template>
       <template #n_shot_prompts-header="{ column }">
@@ -477,8 +601,8 @@ const columnVisibility = ref({
         </UButton>
       </template>
       <template #n_shot_prompts-cell="{ row }">
-        <span class="flex justify-center">
-          {{ row.original.n_shot_prompts }}
+        <span class=" ">
+          {{ row.original.n_shot_prompts || 'NA' }}
         </span>
       </template>
       <template #temp_retrieval_llm-header="{ column }">
@@ -499,31 +623,34 @@ const columnVisibility = ref({
         </UButton>
       </template>
       <template #temp_retrieval_llm-cell="{ row }">
-        <span class="flex justify-center">
-          {{ row.original.temp_retrieval_llm }}
+        <span class=" ">
+          {{ row.original.temp_retrieval_llm || 'NA' }}
         </span>
       </template>
       <template #chunking_strategy-cell="{ row }">
-        {{ useHumanChunkingStrategy(row.original.chunking_strategy) }}
+        {{ useHumanChunkingStrategy(row.original.chunking_strategy) || 'NA' }}
       </template>
       <template #chunk_size-cell="{ row }">
-        <span class="flex justify-center">
-          {{ useHumanChunkingStrategy(row.original.chunking_strategy) === 'Fixed' ? row.original.chunk_size : [row.original.hierarchical_child_chunk_size, row.original.hierarchical_parent_chunk_size] }}
+        <span>
+          {{ row.original.chunking_strategy ?  useHumanChunkingStrategy(row.original.chunking_strategy) === 'Fixed' ? row.original.chunk_size : [row.original.hierarchical_child_chunk_size, row.original.hierarchical_parent_chunk_size] : 'NA' }}
         </span>
       </template>
        <template #chunk_overlap-cell="{ row }">
-       <span class="flex justify-center">
-          {{ useHumanChunkingStrategy(row.original.chunking_strategy) === 'Fixed' ? row.original.chunk_overlap : row.original.hierarchical_chunk_overlap_percentage}}
+       <span class=" ">
+          {{ row.original.chunking_strategy ?  useHumanChunkingStrategy(row.original.chunking_strategy) === 'Fixed' ? row.original.chunk_overlap : row.original.hierarchical_chunk_overlap_percentage : 'NA'}}
           </span>
       </template>
       <template #indexing_algorithm-cell="{ row }">
-        {{ useHumanIndexingAlgorithm(row.original.indexing_algorithm) }}
+        {{ useHumanIndexingAlgorithm(row.original.indexing_algorithm) || 'NA' }}
       </template>
       <template #embedding_model-cell="{ row }">
-        {{ useModelName("indexing", row.original.embedding_model) }}
+        {{ useModelName("indexing", row.original.embedding_model) || 'NA' }}
       </template>
       <template #retrieval_model-cell="{ row }">
-        {{ useModelName("retrieval", row.original.retrieval_model) }}
+        {{ useModelName("retrieval", row.original.retrieval_model) || 'NA' }}
+      </template>
+       <template #kb_name-cell="{row}">
+      {{!row.original.bedrock_knowledge_base ? 'NA' : row.original.kb_name}}
       </template>
     </UTable>
   </div>

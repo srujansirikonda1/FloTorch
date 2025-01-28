@@ -35,6 +35,10 @@ useHead({
 
 const columns = ref<TableColumn<ExperimentQuestionMetric>[]>([
   {
+    header: "S.No",
+    accessorKey: "sno"
+   },
+  {
     header: "Question",
     accessorKey: "question",
   },
@@ -82,7 +86,7 @@ const items = ref([
     <UTabs
       :items="items"
       :unmount-on-hide="false"
-      class="w-full"
+      class="w-full experiment-details-tabs"
       variant="pill"
     >
       <template #account="{ item }">
@@ -98,12 +102,21 @@ const items = ref([
             </div>
           </template>
           <UTable
-            class="h-100"
+            class="h-100 experiment-details-table"            
             sticky
             :columns="columns"
             :data="questionMetrics?.question_metrics"
             :loading="isLoading"
           >
+           <template #empty>
+            <div  class="flex flex-col items-center justify-center py-6">
+              <p v-if="isLoading" class="text-gray-500">Please wait, we are fetching experiment question metrics...!</p>
+              <p v-else>No valid experiments are found...!</p>
+            </div>
+          </template>
+           <template #sno-cell="{ row }">
+            <td>{{ row.index + 1 }}</td>
+          </template>
             <template #guardrail_input_assessment-cell="{ row }">
               <template v-if="row.original.guardrail_input_assessment">
                 <ProjectExperimentAssessments
@@ -158,7 +171,7 @@ const items = ref([
                       experimentsData?.indexing_cost ?
                       useHumanCurrencyAmount(
                         experimentsData?.indexing_cost
-                      ) : 'Unable to fetch data'
+                      ) : !experimentsData?.config?.bedrock_knowledge_base ? 'Unable to fetch data ' : 'Bedrock knowledge base pricing not included'
                     }}
                   </td>
                 </tr>
@@ -169,6 +182,18 @@ const items = ref([
                       experimentsData?.retrieval_cost ? 
                       useHumanCurrencyAmount(
                         experimentsData?.retrieval_cost
+                      ) : 'Unable to fetch data'
+                    }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-medium">Inferencing Cost</td>
+                  <td>
+                  
+                    {{
+                      experimentsData?.inferencing_cost ? 
+                      useHumanCurrencyAmount(
+                        experimentsData?.inferencing_cost
                       ) : 'Unable to fetch data'
                     }}
                   </td>
@@ -185,6 +210,7 @@ const items = ref([
                     }}
                   </td>
                 </tr>
+                 
               </tbody>
             </table>
           </UCard>
@@ -201,7 +227,7 @@ const items = ref([
                     {{ 
                       experimentsData?.indexing_time ? 
                       useConvertSecondsToDHM(Number(experimentsData?.indexing_time)) 
-                      : 'Unable to fetch time'
+                      : !experimentsData?.config?.bedrock_knowledge_base ? "Unable to fetch time" : 'NA'
                     }}
                   </td>
                 </tr>
@@ -238,7 +264,7 @@ const items = ref([
                 <tr>
                   <td class="font-medium w-40">Indexing Embedded Tokens</td>
                   <td class="w-40">
-                    {{ experimentsData?.index_embed_tokens }}
+                    {{ experimentsData?.index_embed_tokens || 'NA' }}
                   </td>
                 </tr>
               </tbody>

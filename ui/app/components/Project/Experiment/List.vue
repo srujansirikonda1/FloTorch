@@ -50,7 +50,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "config.embedding_model",
     enableHiding: true,
     cell: ({ row }) => {
-      return getModelName("indexing", row.original.config.embedding_model)
+      return getModelName("indexing", row.original.config.embedding_model) || 'NA'
     }
   },
   {
@@ -73,7 +73,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "config.retrieval_model",
     enableHiding: true,
     cell: ({ row }) => {
-      return getModelName("retrieval", row.original.config.retrieval_model)
+      return getModelName("retrieval", row.original.config.retrieval_model) || 'NA'
     }
   },
   {
@@ -96,7 +96,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "config.indexing_algorithm",
     enableHiding: true,
     cell: ({ row }) => {
-      return useHumanIndexingAlgorithm(row.original.config.indexing_algorithm)
+      return useHumanIndexingAlgorithm(row.original.config.indexing_algorithm) || 'NA'
     }
   },
   {
@@ -118,7 +118,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "config.chunking_strategy",
     enableHiding: true,
     cell: ({ row }) => {
-      return useHumanChunkingStrategy(row.original.config.chunking_strategy)
+      return useHumanChunkingStrategy(row.original.config.chunking_strategy) || 'NA'
     },
     label: "Chunking"
   },
@@ -231,9 +231,17 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "eval_metrics.context_precision_score",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.eval_metrics?.context_precision_score ?? 0;
-      const b = rowB.original.eval_metrics?.context_precision_score ?? 0;
-      return Number(a) - Number(b);
+      if ("M" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.M?.context_precision_score;
+        const b = rowB.original.eval_metrics?.M?.context_precision_score;
+        return Number(a) - Number(b);
+      }
+      if ("context_precision_score" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.context_precision_score;
+        const b = rowB.original.eval_metrics?.context_precision_score;
+        return Number(a) - Number(b);
+      }
+      return 0;
     },
     cell: ({ row }) => {
       if ("context_precision_score" in row.original.eval_metrics) {
@@ -265,9 +273,17 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "eval_metrics.aspect_critic_score",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.eval_metrics?.aspect_critic_score ?? 0;
-      const b = rowB.original.eval_metrics?.aspect_critic_score ?? 0;
-      return Number(a) - Number(b);
+      if ("M" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.M?.aspect_critic_score ?? 0;
+        const b = rowB.original.eval_metrics?.M?.aspect_critic_score ?? 0;
+        return Number(a) - Number(b);
+      }
+      if ("aspect_critic_score" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.aspect_critic_score ?? 0;
+        const b = rowB.original.eval_metrics?.aspect_critic_score ?? 0;
+        return Number(a) - Number(b);
+      }
+      return 0;
     },
     cell: ({ row }) => {
       if ("aspect_critic_score" in row.original.eval_metrics) {
@@ -299,9 +315,17 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "eval_metrics.answers_relevancy_score",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.eval_metrics?.answers_relevancy_score ?? 0;
-      const b = rowB.original.eval_metrics?.answers_relevancy_score ?? 0;
-      return Number(a) - Number(b);
+      if ("M" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.M?.answers_relevancy_score ?? 0;
+        const b = rowB.original.eval_metrics?.M?.answers_relevancy_score ?? 0;
+        return Number(a) - Number(b);
+      }
+      if ("answers_relevancy_score" in rowA.original.eval_metrics) {
+        const a = rowA.original.eval_metrics?.answers_relevancy_score ?? 0;
+        const b = rowB.original.eval_metrics?.answers_relevancy_score ?? 0;
+        return Number(a) - Number(b);
+      }
+      return 0;
     },
     cell: ({ row }) => {
       if ("answers_relevancy_score" in row.original.eval_metrics) {
@@ -403,7 +427,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
       return h(UButton, {
         color: "neutral",
         variant: "ghost",
-        label: "Directional Pricing",
+        label: "Directional Cost",
         icon: isSorted
           ? isSorted === "asc"
             ? "i-lucide-arrow-up-narrow-wide"
@@ -413,7 +437,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       });
     },
-    label: 'Directional Pricing',
+    label: 'Directional Cost',
     accessorKey: "directional_pricing",
     enableHiding: true,
     sortingFn: (rowA, rowB) => {
@@ -508,7 +532,63 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     cell: ({ row }) => {
       return row.original.rerank_model_id? row.original.rerank_model_id : "-"
     }
-  }
+  },
+   {
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Guardrail",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    label: 'Guardrail',
+    accessorKey: "config.guardrail_name",
+    enableHiding: true,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.config?.guardrail_name ?? 0;
+      const b = rowB.original.config?.guardrail_name ?? 0;
+      return a.localeCompare(b);
+    },
+    cell: ({ row }) => {
+      return row.original.config?.guardrail_name ? row.original.config.guardrail_name : "NA"
+    }
+  },
+  {
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Bedrock Kb Name",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
+    label: 'Bedrock Kb Name',
+    accessorKey: "config.kb_name",
+    enableHiding: true,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.config?.kb_name ?? 0;
+      const b = rowB.original.config?.kb_name ?? 0;
+      return a.localeCompare(b);
+    },
+    cell: ({ row }) => {
+      return row.original.config?.kb_name ? row.original.config.kb_name : "-"
+    }
+  },
 ])
 
 const navigateToExperiment = (experimentId: string) => {
@@ -553,6 +633,11 @@ const columnVisibility = ref({
       </UDropdownMenu>
     </div>
     <UTable class="h-100" sticky v-model:column-visibility="columnVisibility" ref="table" :columns="columns" :data="experiments">
+       <template #empty>
+        <div  class="flex flex-col items-center justify-center py-6">
+          <p class="text-gray-500">No experiments found...!</p>
+        </div>
+      </template>
       <template #id-cell="{ row }">
         <a 
           href="#"
@@ -576,7 +661,7 @@ const columnVisibility = ref({
       <template #directional_pricing-cell="{row}">     
         <div class="w-full">
             <UTooltip   :content="{side: 'right'}">
-                    <a class="text-blue-500 hover:underline" href="#">{{row.original?.config?.directional_pricing}}</a>
+                    <a class="text-blue-500 hover:underline" href="#">{{useHumanCurrencyAmount(row.original?.config?.directional_pricing)}}</a>
                     <template #content>
                       <UCard class="w-full">
                         <table class="w-full">

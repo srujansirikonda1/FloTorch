@@ -401,6 +401,13 @@ export const useProjectCreateMeta = () => {
           type: "meta-llama/Meta-Llama-3-70B-Instruct",
           model_name : "ml.p4d.24xlarge"
         },
+        {
+          label: "deepseek-ai/DeepSeek-R1-Distill-Llama-8B (ml.g5.2xlarge)",
+          value: "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+          service: "sagemaker",
+          type: "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+          model_name : "ml.g5.2xlarge"
+        },
       ],
       temperature: [
         {
@@ -659,6 +666,7 @@ export const useProjectUploadConfig = () => {
       prestep: {
         ...config.prestep,
         name: config.name,
+        kb_model : undefined,
         kb_data: undefined,
         gt_data: undefined,
       },
@@ -667,11 +675,6 @@ export const useProjectUploadConfig = () => {
         embedding: config.indexing?.embedding?.map((pc: any) => {
           return useGetModelData("indexing", pc.model);
         }),
-        chunk_overlap: undefined,
-        chunk_size: undefined,
-        hierarchical_parent_chunk_size: undefined,
-        hierarchical_child_chunk_size: undefined,
-        hierarchical_chunk_overlap_percentage: undefined,
       },
       retrieval: {
         ...config.retrieval,
@@ -845,3 +848,18 @@ export const useConvertStringToNumber = (value: string | number) => {
   }
   return value;
 } 
+
+export const useKnowledgeBaseModel = ()=>{
+  return {
+    kb_model : [
+      {
+        label: "Bedrock Knowledge Bases",
+        value: "Bedrock-Knowledge-Bases"
+      },
+      {
+        label: "Upload my own data",
+        value: "default-upload"
+      },
+    ]
+  }
+}
