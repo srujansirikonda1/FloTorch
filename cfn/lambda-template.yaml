@@ -532,7 +532,7 @@ Resources:
       FunctionName: !Sub flotorch-costcompute-${TableSuffix}
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
-        ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:${CostComputeImageTag}
+        ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:latest
       PackageType: Image
       MemorySize: 4096
       Timeout: 900
