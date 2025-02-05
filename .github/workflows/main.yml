@@ -42,7 +42,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Runs on EC2 instance with IAM role attached
+    runs-on: self-hosted  #self-hosted runner(EC2)
 
     steps:
       - name: Checkout Repository
