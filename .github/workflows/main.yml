@@ -1,0 +1,56 @@
+name: Deploy FloTorch Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      AWS_REGION:
+        description: "AWS Region (e.g., us-east-1)"
+        required: true
+        default: "us-east-1"
+
+      PROJECT_NAME:
+        description: "Project Name"
+        required: true
+
+      TABLE_SUFFIX:
+        description: "Unique Table Suffix"
+        required: true
+
+      CLIENT_NAME:
+        description: "Client Name"
+        required: true
+
+      OPENSEARCH_ADMIN_USER:
+        description: "OpenSearch Admin Username"
+        required: true
+        default: "admin"
+
+      OPENSEARCH_ADMIN_PASSWORD:
+        description: "OpenSearch Admin Password"
+        required: true
+
+      NGINX_AUTH_PASSWORD:
+        description: "Nginx Auth Password"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # Runs on EC2 instance with IAM role attached
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy CloudFormation Stack
+        run: |
+          aws cloudformation create-stack \
+            --stack-name flotorch-stack \
+            --template-url https://flotorch-public.s3.us-east-1.amazonaws.com/templates/master-template.yaml \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+            --parameters \
+                ParameterKey=ProjectName,ParameterValue=${{ inputs.PROJECT_NAME }} \
+                ParameterKey=TableSuffix,ParameterValue=${{ inputs.TABLE_SUFFIX }} \
+                ParameterKey=ClientName,ParameterValue=${{ inputs.CLIENT_NAME }} \
+                ParameterKey=OpenSearchAdminUser,ParameterValue=${{ inputs.OPENSEARCH_ADMIN_USER }} \
+                ParameterKey=OpenSearchAdminPassword,ParameterValue=${{ inputs.OPENSEARCH_ADMIN_PASSWORD }} \
+                ParameterKey=NginxAuthPassword,ParameterValue=${{ inputs.NGINX_AUTH_PASSWORD }}
