@@ -40,9 +40,11 @@ on:
         description: "Nginx Auth Password"
         required: true
 
+
 jobs:
+
   deploy:
-    runs-on: self-hosted  #self-hosted runner(EC2)
+    runs-on: [self-hosted, FloTorch] 
 
     steps:
       - name: Checkout Repository
@@ -51,8 +53,9 @@ jobs:
       - name: Deploy FloTorch Master Stack
         run: |
           aws cloudformation create-stack \
+            --region ${{ inputs.AWS_REGION }} \
             --stack-name flotorch-stack \
-            --template-url https://flotorch-public.s3.us-east-1.amazonaws.com/2.0.1/templates/master-template.yaml \
+            --template-url https://flotorch-public.s3.amazonaws.com/2.0.1/templates/master-template.yaml \
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --parameters \
                 ParameterKey=ProjectName,ParameterValue=${{ inputs.PROJECT_NAME }} \
