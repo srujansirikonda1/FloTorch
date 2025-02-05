@@ -19,11 +19,11 @@ useHead({
           target="_blank" />
       </div>
     </header>
-    <main class="flex-1 container mx-auto py-4">
+    <main class="flex-1 container max-w-6xl mx-auto py-4">
       <slot />
     </main>
     <footer class="bg-gray-800 text-white p-2 text-sm">
-      <div class="container max-w-7xl mx-auto flex justify-center items-center">
+      <div class="container mx-auto flex justify-center items-center">
         <div>
           Powered by <a href="https://flotorch.ai?utm_source=flowtorch-repo" target="_blank"
             class="text-white underline">FloTorch.ai</a>. For
@@ -34,3 +34,13 @@ useHead({
     </footer>
   </div>
 </template>
+
+
+<style>
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 72rem;
+  }
+}
+</style>
