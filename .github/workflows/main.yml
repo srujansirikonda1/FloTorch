@@ -40,6 +40,9 @@ on:
         description: "Nginx Auth Password"
         required: true
 
+      TEMPLATE_VERSION:
+        description: "FloTorch Template Version"
+        required: true
 
 jobs:
 
@@ -55,7 +58,7 @@ jobs:
           aws cloudformation create-stack \
             --region ${{ inputs.AWS_REGION }} \
             --stack-name flotorch-stack \
-            --template-url https://flotorch-public.s3.amazonaws.com/2.0.1/templates/master-template.yaml \
+            --template-url https://flotorch-public.s3.amazonaws.com/${{ inputs.TEMPLATE_VERSION }}/templates/master-template.yaml \
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --parameters \
                 ParameterKey=ProjectName,ParameterValue=${{ inputs.PROJECT_NAME }} \
