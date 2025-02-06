@@ -63,13 +63,20 @@ const props = defineProps<{
             <td class="font-medium">Embedding Model</td>
             <td>{{ useModelName("indexing", props.experimentsData?.config?.embedding_model!) }} {{
               props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' :
-              (useHumanModelService(props.experimentsData?.config?.embedding_service!)) }}
+              `(${useHumanModelService(props.experimentsData?.config?.embedding_service!)})`
+            }}
             </td>
           </tr>
           <tr>
             <td class="font-medium">Inferencing Model</td>
             <td>{{ useModelName("retrieval", props.experimentsData?.config?.retrieval_model!) }} ({{
               useHumanModelService(props.experimentsData?.config?.retrieval_service!) }})
+            </td>
+          </tr>
+          <tr>
+            <td class="font-medium">Reranking Model</td>
+            <td>{{ 
+             props.experimentsData?.config?.rerank_model_id! }}
             </td>
           </tr>
            <tr v-if="props.experimentsData?.config?.guardrail_name">
@@ -79,15 +86,9 @@ const props = defineProps<{
             </td>
           </tr>
            <tr v-if="props.experimentsData?.config?.kb_data">
-            <td class="font-medium">Bedrock Kb data</td>
+            <td class="font-medium">Knowledge Base Data</td>
             <td>{{
-              props.experimentsData?.config?.kb_data }}
-            </td>
-          </tr>
-          <tr v-if="props.experimentsData?.config?.kb_name">
-            <td class="font-medium">Bedrock Kb Name</td>
-            <td>{{
-              props.experimentsData?.config?.kb_name }}
+             props.experimentsData?.config?.bedrock_knowledge_base === true ? props.experimentsData?.config?.kb_name : props.experimentsData?.config?.kb_data }}
             </td>
           </tr>
           <tr v-if="props.experimentsData?.config?.guardrail_id">
