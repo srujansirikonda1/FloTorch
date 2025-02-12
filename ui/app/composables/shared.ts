@@ -878,6 +878,10 @@ export const useKnowledgeBaseModel = ()=>{
   return {
     kb_model : [
       {
+        label: "None",
+        value: "none"
+      },
+      {
         label: "Bedrock Knowledge Bases",
         value: "Bedrock-Knowledge-Bases"
       },
