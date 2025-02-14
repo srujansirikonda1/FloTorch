@@ -84,8 +84,16 @@ router.afterEach(() => drawerOpen.value = false)
             <Placeholder class="">
               <div class="tooltip-description pr-[8px]" v-html="content?.info"></div>
               <div class="tooltip-description mt-3 pr-[8px]"> 
-               <NuxtLink target="_blank" :to="`https://github.com/FissionAI/FloTorch/blob/v2.1.0/Help_Links.MD#${content.link}`" class="font-bold ml-1 external-link">Learn More<UIcon name="i-rivet-icons:link-external"
-          /></NuxtLink>
+               <!-- <NuxtLink target="_blank" :to="`https://github.com/FissionAI/FloTorch/blob/v2.1.0/Help_Links.MD#${content.link}`" class="font-bold ml-1 external-link">Learn More<UIcon name="i-rivet-icons:link-external"
+          /></NuxtLink> -->
+
+          <h4 class="text-[18px] font-bold">Learn More <UIcon name="i-rivet-icons:link-external"/></h4>
+              <ul class="my-4">
+              <li>
+               <NuxtLink target="_blank" :to="`https://github.com/FissionAI/FloTorch/blob/v2.1.0/Help_Links.MD#${content.link}`" class="font-bold py-5 external-link">{{content.label}}</NuxtLink>
+
+              </li>
+              </ul>
 
               </div>
             </Placeholder>

@@ -11,7 +11,7 @@ useHead({
 <template>
   <div class="flex flex-col min-h-screen bg-white w-full">
     <header class="navbar text-white p-2 w-full">
-     <div class="mx-10  flex flex-col">
+     <div class="mx-10 pb-12  flex flex-col">
         <div class="w-full flex justify-between">
           <NuxtLink :to="{ name: 'index' }" class="self-center">
             <img src="/logo.png" alt="logo" class="w-[200px]" />
