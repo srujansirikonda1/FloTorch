@@ -50,6 +50,7 @@ Welcome to FloTorch! This guide will help you set up FloTorch's infrastructure o
    ```
 2. AWS CLI installed and configured on your computer
 3. AWS Marketplace Subscription (see next section)
+4. Docker installed (if you plan to build and push custom images)
 
 ### 2. AWS Marketplace Subscription ‼️
 Before starting the installation, subscribe to FloTorch:
@@ -107,29 +108,112 @@ Before starting the installation, subscribe to FloTorch:
 | TableSuffix | "abctry" | 6 lowercase characters only alphabets allowed |
 | ClientName | "acmecorp" | Must be lowercase |
 | OpenSearchAdminUser | "admin" | Admin username |
-| OpenSearchAdminPassword | "YourSecurePassword123!" | 12-41 chars with letters, numbers, symbols |
-| NginxAuthPassword | "YourNginxPassword123!" | 12-41 chars with letters, numbers, symbols |
+| OpenSearchAdminPassword | "YourSecurePassword123!" | 12-41 chars with letters, numbers, specialchars |
+| NginxAuthPassword | "YourNginxPassword123!" | 12-41 chars with letters, numbers, specialchars |
 
-### Approach #1: Using AWS Cloudformation Template (<mark> Ensure the above Parameter conditions are met </mark>).
+### Approach #1: AWS Cloudformation Template (<mark> Make sure you're subscribed to [FloTorch in Marketplace](https://aws.amazon.com/marketplace/pp/prodview-z5zcvloh7l3ky?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) </mark>).
 
 Click this link: [Install FloTorch (US East 1)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create?stackName=flotorch-stack&templateURL=https://flotorch-public.s3.us-east-1.amazonaws.com/2.0.3/templates/master-template.yaml)
 
-### Approach #2: AWS Command Line Installation (<mark> Ensure the above Parameter conditions are met </mark>).
+### Approach #2: Command Line Installation.
+
+1. Clone the repository:
+```bash
+git clone https://github.com/FissionAI/FloTorch.git
+cd FloTorch
+```
+
+2. Make the provision script executable:
+```bash
+chmod +x provision.sh
+```
+
+3. Run the provision script:
+```bash
+./provision.sh
+```
+
+## Configuration Steps
+
+The script will prompt you for the following information:
+
+### 1. AWS Region
+- Choose AWS regions (us-east-1, us-west-2)
+- Default: `us-east-1`
 
 ```bash
-aws cloudformation create-stack \
-    --stack-name flotorch-stack \
-    --template-url https://flotorch-public.s3.us-east-1.amazonaws.com/templates/master-template.yaml \
-    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
-    --parameters \
-        ParameterKey=PrerequisitesMet,ParameterValue=yes \
-        ParameterKey=ProjectName,ParameterValue=your-project-name \
-        ParameterKey=TableSuffix,ParameterValue=unique-suffix \
-        ParameterKey=ClientName,ParameterValue=your-client-name \
-        ParameterKey=OpenSearchAdminUser,ParameterValue=admin \
-        ParameterKey=OpenSearchAdminPassword,ParameterValue=YourSecurePassword123! \
-        ParameterKey=NginxAuthPassword,ParameterValue=YourNginxPassword123!
+Enter AWS region [us-east-1]:
 ```
+### 2. AWS Marketplace Subscription
+- Answer `no` if you haven't subscribed to FloTorch on AWS Marketplace yet
+- Answer `yes` if you have an active subscription
+
+```bash
+Subscribed to FloTorch on AWS Marketplace? (yes/no) [no]:
+```
+
+### 3. Stack Parameters
+- This will be used as your CloudFormation stack name. Must be unique within your AWS account
+- Example: `MyProject` or `FloTorch-Dev`
+
+```bash
+Enter project name [FloTorch]:
+```
+
+```bash
+Enter Table suffix (exactly 6 lowercase letters) [fltdev]:
+```
+- Used to create resources with unique suffix
+- Example: `asdfgh`, `qwerty`, `uiojkl` etc
+
+```bash
+Enter client/organization name [FloTorch]:
+```
+- Your organization or team name
+- Used for resource tagging
+
+### 4. OpenSearch is needed for FloTorch indexing. Skip if using Amazon Knowledge Bases or leverage Foundational Model data for inferencing (no KB dataset).
+- `yes`: Deploys with OpenSearch integration
+- `no`: Deploys without OpenSearch
+```bash
+Do you need OpenSearch? (yes/no) [yes]:
+
+# The details below will be asked if OpenSearch has been chosen.
+
+Enter OpenSearch admin username [admin]:
+Enter OpenSearch admin password (12-41 chars with letters, numbers, specialchars):
+
+```
+  
+### 5. FloTorch App login
+- Choose strong passwords
+- Store these securely as you'll need them to access services
+
+```bash
+Enter NGINX password (12-41 chars with letters, numbers, specialchars):
+```
+
+## Deployment
+
+The script will:
+1. Create a CloudFormation stack with your project name
+2. Build Docker Images in your local and pushes to ECR, if there is no marketplace subscription.
+3. Deploy all necessary resources
+4. Output the API Gateway URL when complete
+
+To monitor the deployment:
+```bash
+aws cloudformation describe-stack-events --stack-name YOUR_PROJECT_NAME
+```
+
+## Post-Installation
+
+After successful deployment, you'll receive:
+1. API Gateway URL for making requests
+2. OpenSearch endpoint (if enabled)
+3. Monitoring dashboard URL
+
+Store these URLs securely for future use.
 
 ## Monitor your setup
 
@@ -165,6 +249,29 @@ aws cloudformation create-stack \
 | Security Groups | Network access control |
 | Authentication | NGINX basic auth |
 | Access Control | OpenSearch Security |
+
+## Troubleshooting
+
+### Common Issues
+
+1. Stack Creation Failed
+   - Check CloudFormation events in AWS Console
+   - Verify your AWS CLI has sufficient permissions
+
+2. Resource Limits
+   - Ensure your AWS account has sufficient service quotas
+   - Request limit increases if needed
+
+3. Issues for AWS Marketplace Subscription Users
+   - Verify your subscription status in AWS Marketplace
+   - Ensure your subscription is active and properly configured
+
+## Cleanup
+
+To remove all deployed resources:
+```bash
+aws cloudformation delete-stack --stack-name YOUR_PROJECT_NAME
+```
 
 ## Getting Help 
 
