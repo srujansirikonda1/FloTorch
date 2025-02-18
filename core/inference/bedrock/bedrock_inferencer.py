@@ -27,10 +27,18 @@ class BedrockInferencer(BaseInferencer):
             region_name=self.region_name
         )
 
-    def generate_prompt(self, experiment_config: ExperimentalConfig, default_prompt: str, user_query: str, context: List[Dict]):
+    def generate_prompt(self, experiment_config: ExperimentalConfig, default_prompt: str, user_query: str, context: List[Dict] = None) -> Tuple[str, List[Dict[str, Any]]]:
         # Get n_shot config values first to avoid repeated lookups
         n_shot_prompt_guide = experiment_config.n_shot_prompt_guide_obj
         n_shot_prompt = experiment_config.n_shot_prompts
+
+        messages = []
+
+        context_text = ""
+        if context:
+            context_text = self._format_context(context)
+            if context_text:
+                messages.append(self._prepare_conversation(role="user", message=context_text))
 
         # Input validation
         if n_shot_prompt < 0:
@@ -39,23 +47,8 @@ class BedrockInferencer(BaseInferencer):
         # Get system prompt
         system_prompt = default_prompt if n_shot_prompt_guide is None or n_shot_prompt_guide.system_prompt is None else n_shot_prompt_guide.system_prompt
         
-        context_text = self._format_context(context)
-        
         base_prompt = n_shot_prompt_guide.user_prompt if n_shot_prompt_guide.user_prompt else ""
-        
-        # Return early if no examples needed
-        if n_shot_prompt == 0:
-            # Use string concatenation
-            logger.info("into zero shot prompt")
-            prompt = (
-                system_prompt + "\n\n" + 
-                "<context>\n" + 
-                context_text + "\n" + 
-                "</context>\n" + 
-                base_prompt + "\n" + 
-                "Question: " + user_query
-            )
-            return prompt.strip()
+        messages.append(self._prepare_conversation(role="user", message=base_prompt))
         
         # Get examples
         examples = n_shot_prompt_guide.examples
@@ -66,37 +59,47 @@ class BedrockInferencer(BaseInferencer):
                         else examples)
         
         # Use string concatenation for example formatting
-        example_text = ""
         for example in selected_examples:
-            example_text += "- " + example["example"] + "\n"
+                if 'example' in example:
+                    messages.append(self._prepare_conversation(role="user", message=example['example']))
+                elif 'question' in example and 'answer' in example:
+                    messages.append(self._prepare_conversation(role="user", message=example['question']))
+                    messages.append(self._prepare_conversation(role="assistant", message=example['answer']))
         
         logger.info(f"into {n_shot_prompt} shot prompt  with examples {len(selected_examples)}")
-        # Use string concatenation for the entire prompt
-        prompt = (
-            system_prompt + "\n\n" + 
-            "Few examples:\n" + 
-            example_text + "\n" + 
-            "<context>\n" + 
-            context_text + "\n" + 
-            "</context>\n" + 
-            base_prompt + "\n" + 
-            "Question: " + user_query
-        )
+
+        # Add the current user prompt
+        messages.append(self._prepare_conversation(role="user", message=user_query))
         
-        return prompt.strip()
+        return system_prompt, messages
      
     @BedRockRetryHander()
-    def generate_text(self, user_query: str, context: List[Dict], default_prompt: str, **kwargs) -> Tuple[Dict[Any, Any], str]:
+    def generate_text(self, user_query: str, default_prompt: str, context: List[Dict] = None, **kwargs) -> Tuple[Dict[Any, Any], str]:
         try:
             # Code to generate prompt considering the upload prompt config file
-            converse_prompt = self.generate_prompt(self.experiment_config, default_prompt, user_query, context)
-            messages = self._prepare_payload(context, converse_prompt, user_query)
-            inference_config={"maxTokens": 512, "temperature": self.experiment_config.temp_retrieval_llm, "topP": 0.9}
-            response = self.client.converse(
-                modelId=self.model_id,
-                messages=messages,
-                inferenceConfig=inference_config
-            )
+            system_prompt, messages = self.generate_prompt(self.experiment_config, default_prompt, user_query, context)
+
+            inference_config = {
+                "maxTokens": 512, 
+                "temperature": self.experiment_config.temp_retrieval_llm, 
+                "topP": 0.9
+            }
+            
+            is_titan_v1 = self.model_id in ("amazon.titan-text-express-v1", "amazon.titan-text-lite-v1")
+
+            request_params = {
+                "modelId": self.model_id,
+                "messages": ([self._prepare_conversation(role="user", message=system_prompt)] if is_titan_v1 else []) + messages,
+                "inferenceConfig": inference_config
+            }
+            
+            # Add system parameter only for non-Titan-v1 models
+            #TODO: Short-term fix, will be addressed using inheritence as part of refactoring
+            if not is_titan_v1:
+                request_params["system"] = [{"text" : system_prompt}]
+            
+            response = self.client.converse(**request_params)
+           
             metadata = {}
             if 'usage' in response:
                 for key, value in response['usage'].items():
@@ -109,17 +112,15 @@ class BedrockInferencer(BaseInferencer):
             logger.error(f"Error generating text with Bedrock: {str(e)}")
             raise
 
-    def _prepare_payload(self, context: List[Dict], prompt: str, user_query: str):
-        # Format context documents into a single string
-        context_text = self._format_context(context)
-        logger.debug(f"Formatted context text length: {len(context_text)}")
-
-        conversation = [
-            {
-                "role": "user", 
-                "content": [{"text" : f"{prompt}"}]
+    def _prepare_conversation(self, message: str, role: str):
+        # Format message and role into a conversation
+        if not message or not role:
+            logger.error(f"Error in parsing message or role")
+        conversation = {
+                "role": role, 
+                "content": [{"text" : message}]
             }
-        ]
+        
         return conversation
 
     def _format_context(self, context: List[Dict[str, str]]) -> str:
@@ -129,6 +130,7 @@ class BedrockInferencer(BaseInferencer):
             for i, doc in enumerate(context)
         ])
         logger.debug(f"Formatted context text length: {len(context_text)}")
+        context_text = "<context>\n" + context_text + "\n" +  "</context>\n"
         return context_text
 
     def _extract_response(self, response: Dict) -> str:

@@ -2,6 +2,8 @@
 import type { TableColumn } from "@nuxt/ui";
 import { useQuery, useMutation } from "@tanstack/vue-query";
 const experimentId = useRouteParams<string>("experimentId");
+const UButton = resolveComponent("UButton");
+
 
 const project = inject<Ref<Project>>("project");
 const experimentsData = ref([]);
@@ -35,31 +37,94 @@ useHead({
 
 const columns = ref<TableColumn<ExperimentQuestionMetric>[]>([
   {
-    header: "S.No",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "S.No",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "sno"
    },
   {
-    header: "Question",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Question",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "question",
   },
   {
-    header: "Ground Truth",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Ground Truth",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "gt_answer",
   },
   {
-    header: "Generated Answer",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Generated Answer",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "generated_answer",
   },
   {
-    header: "Guardrails User Query",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Guardrails User Query",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "guardrail_input_assessment",
   },
   {
-    header: "Guardrails Context",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Guardrails Context",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "guardrail_context_assessment",
   },
   {
-    header: "Guardrails Model Response",
+    header: ({ column }) => {
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+          color: "neutral",
+          variant: "ghost",
+          label: "Guardrails Model Response",
+        }),
+        h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+      ]);
+    },
     accessorKey: "guardrail_result_assessment",
   },
 ]);
@@ -112,7 +177,7 @@ const items = ref([
       :items="items"
       :unmount-on-hide="false"
       class="w-full experiment-details-tabs"
-      variant="pill"
+      variant="link"
     >
       <template #account="{ item }">
         <UCard>
@@ -179,7 +244,7 @@ const items = ref([
         />
       </template>
       <template #cost-breakdown="{ item }">
-        <UCard class="my-5">
+        <UCard class="my-1">
           <template #header>
             <h2 class="text-xl font-medium">Breakdown</h2>
           </template>
@@ -195,7 +260,7 @@ const items = ref([
                       <tbody>
                         <tr v-for="key in overall_metadata.order" :key="key">
                           <template v-if="overall_metadata[key] !== undefined">
-                            <td class="font-medium w-40 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
+                            <td class="font-medium w-17 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
                             <td v-if="key.includes('time')" class="w-40 break-all">{{ useConvertSecondsToDHM(Number(overall_metadata[key])) }}</td>
                             <td v-else-if="key.includes('cost')" class="w-40 break-all">{{ useHumanCurrencyAmount(Number(overall_metadata[key])) }}</td>
                             <td v-else class="w-40 break-all">{{ overall_metadata[key] }}</td>
@@ -221,13 +286,27 @@ const items = ref([
             </template>
             <table class="w-full">
               <tbody>
-                <tr v-if="indexing_metadata && !experimentsData?.config?.bedrock_knowledge_base">
+              <tr v-if="experimentsData?.config?.bedrock_knowledge_base">
+                  <td colspan="2">
+                    <div class="flex flex-col items-center justify-center py-6">
+                      <p>Bedrock Knowledge Bases Pricing is currently not supported</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-else-if="!experimentsData?.config?.knowledge_base">
+                  <td colspan="2">
+                    <div class="flex flex-col items-center justify-center py-6">
+                      <p>No indexing cost incurred</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-else-if="indexing_metadata && !experimentsData?.config?.bedrock_knowledge_base">
                   <td colspan="2">
                     <table class="w-full">
                       <tbody>
                         <tr v-for="key in indexing_metadata.order" :key="key">
                           <template v-if="indexing_metadata[key] !== undefined">
-                            <td class="font-medium w-40 break-all">{{ 
+                            <td class="font-medium w-17 break-all">{{ 
                               key === 'ecs_cost' 
                                 ? 'ECS Cost' 
                                 : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())))
@@ -239,13 +318,6 @@ const items = ref([
                         </tr>
                       </tbody>
                     </table>
-                  </td>
-                </tr>
-                <tr v-else-if="experimentsData?.config?.bedrock_knowledge_base">
-                  <td colspan="2">
-                    <div class="flex flex-col items-center justify-center py-6">
-                      <p>Bedrock Knowledge Bases Pricing is currently not supported</p>
-                    </div>
                   </td>
                 </tr>
                 <tr v-else>
@@ -271,7 +343,7 @@ const items = ref([
                       <tbody>
                         <tr v-for="key in retriever_metadata.order" :key="key">
                           <template v-if="retriever_metadata[key] !== undefined">
-                            <td class="font-medium w-40 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
+                            <td class="font-medium w-17 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
                           <td v-if="key.includes('time') || key.includes('latency')" class="w-40 break-all">{{ useConvertSecondsToDHM(Number(retriever_metadata[key])) }}</td>
                           <td v-else-if="key.includes('cost')" class="w-40 break-all">{{ useHumanCurrencyAmount(Number(retriever_metadata[key])) }}</td>
                           <td v-else class="w-40 break-all">{{ retriever_metadata[key] }}</td>
@@ -304,7 +376,7 @@ const items = ref([
                       <tbody>
                         <tr v-for="key in inferencer_metadata.order" :key="key">
                           <template v-if="inferencer_metadata[key] !== undefined">
-                            <td class="font-medium w-40 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
+                            <td class="font-medium w-17 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
                           <td v-if="key.includes('time') || key.includes('latency')" class="w-40 break-all">{{ useConvertSecondsToDHM(Number(inferencer_metadata[key])) }}</td>
                             <td v-else-if="key.includes('cost')" class="w-40 break-all">{{ useHumanCurrencyAmount(Number(inferencer_metadata[key])) }}</td>
                             <td v-else class="w-40 break-all">{{ inferencer_metadata[key] }}</td> 
@@ -337,7 +409,7 @@ const items = ref([
                       <tbody>
                         <tr v-for="key in evaluation_metadata.order" :key="key">
                           <template v-if="evaluation_metadata[key] !== undefined">
-                            <td class="font-medium w-40 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
+                            <td class="font-medium w-17 break-all">{{ key === 'ecs_cost' ? 'ECS Cost' : key.split('_').join(' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</td>
                             <td v-if="key.includes('time') || key.includes('latency')" class="w-40 break-all">{{ useConvertSecondsToDHM(Number(evaluation_metadata[key])) }}</td>
                           <td v-else-if="key.includes('cost')" class="w-40 break-all">{{ useHumanCurrencyAmount(Number(evaluation_metadata[key])) }}</td>
                             <td v-else class="w-40 break-all">{{ evaluation_metadata[key] }}</td> 

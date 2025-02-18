@@ -29,19 +29,19 @@ const props = defineProps<{
           </tr>
           <tr>
             <td class="font-medium">Chunking</td>
-            <td>{{ props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' :  props.experimentsData?.config?.chunking_strategy }}</td>
+            <td>{{ (props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' :  props.experimentsData?.config?.chunking_strategy }}</td>
           </tr>
           <tr>
             <td class="font-medium">Vector Dimensions</td>
-            <td>{{ props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' : props.experimentsData?.config?.vector_dimension }}</td>
+            <td>{{ (props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' : props.experimentsData?.config?.vector_dimension }}</td>
           </tr>
           <tr>
             <td class="font-medium">Chunk Size</td>
-            <td>{{ props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' : useHumanChunkingStrategy(props.experimentsData?.config?.chunking_strategy) === 'Fixed' ? props.experimentsData?.config?.chunk_size : [props.experimentsData?.config?.hierarchical_child_chunk_size, props.experimentsData?.config?.hierarchical_parent_chunk_size]}}</td>
+            <td>{{ (props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' : useHumanChunkingStrategy(props.experimentsData?.config?.chunking_strategy) === 'Fixed' ? props.experimentsData?.config?.chunk_size : [props.experimentsData?.config?.hierarchical_child_chunk_size, props.experimentsData?.config?.hierarchical_parent_chunk_size]}}</td>
           </tr>
           <tr>
             <td class="font-medium">Chunk Overlap Percentage</td>
-            <td>{{props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' : useHumanChunkingStrategy(props.experimentsData?.config?.chunking_strategy) === 'Fixed' ? props.experimentsData?.config?.chunk_overlap : props.experimentsData?.config?.hierarchical_chunk_overlap_percentage}}</td>
+            <td>{{(props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' : useHumanChunkingStrategy(props.experimentsData?.config?.chunking_strategy) === 'Fixed' ? props.experimentsData?.config?.chunk_overlap : props.experimentsData?.config?.hierarchical_chunk_overlap_percentage}}</td>
           </tr>
           <tr>
             <td class="font-medium">N Shot Prompts</td>
@@ -49,7 +49,7 @@ const props = defineProps<{
           </tr>
           <tr>
             <td class="font-medium">KNN</td>
-            <td>{{props.experimentsData?.config?.knn_num }}</td>
+            <td>{{props.experimentsData?.config?.knn_num === 0 && props.experimentsData?.config?.knowledge_base !== true  ? 'NA' : props.experimentsData?.config?.knn_num}}</td>
           </tr>
           <tr>
             <td class="font-medium">Inferencing Model Temperature</td>
@@ -57,12 +57,12 @@ const props = defineProps<{
           </tr>
           <tr>
             <td class="font-medium">Indexing Algorithm</td>
-            <td>{{props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' : useHumanIndexingAlgorithm(props.experimentsData?.config?.indexing_algorithm!) }}</td>
+            <td>{{(props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' : useHumanIndexingAlgorithm(props.experimentsData?.config?.indexing_algorithm!) }}</td>
           </tr>
           <tr>
             <td class="font-medium">Embedding Model</td>
             <td>{{ useModelName("indexing", props.experimentsData?.config?.embedding_model!) }} {{
-              props.experimentsData?.config?.bedrock_knowledge_base ? 'NA' :
+              (props.experimentsData?.config?.bedrock_knowledge_base || !props.experimentsData?.config?.knowledge_base) ? 'NA' :
               `(${useHumanModelService(props.experimentsData?.config?.embedding_service!)})`
             }}
             </td>
@@ -75,9 +75,7 @@ const props = defineProps<{
           </tr>
           <tr>
             <td class="font-medium">Reranking Model</td>
-            <td>{{ 
-             props.experimentsData?.config?.rerank_model_id! }}
-            </td>
+            <td>{{ props.experimentsData?.config?.rerank_model_id === 'none' && props.experimentsData?.config?.knowledge_base !== true ? 'NA' : props.experimentsData?.config?.rerank_model_id }}</td>
           </tr>
            <tr v-if="props.experimentsData?.config?.guardrail_name">
             <td class="font-medium">Guardrails</td>
@@ -103,7 +101,7 @@ const props = defineProps<{
             </td>
           </tr>
           <tr v-if="props.experimentsData?.config?.eval_embedding_model">
-            <td class="font-medium">Evaluation embedding model</td>
+            <td class="font-medium">Evaluation Embedding Model</td>
             <td> {{props.experimentsData?.config?.eval_embedding_model}}
             </td>
           </tr>

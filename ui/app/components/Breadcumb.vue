@@ -43,7 +43,6 @@ const breadcrumbItems = computed((): BreadcrumbItem[] => {
   const items: BreadcrumbItem[] = [
     {
       label: "Home",
-      icon: "i-heroicons-home",
       to: "/",
     },
   ];
@@ -69,6 +68,12 @@ const breadcrumbItems = computed((): BreadcrumbItem[] => {
 
   return items;
 });
+
+const handleRedirect = (e: any) => {
+ if(e.target.innerText === 'Projects'){
+  window.location.href = '/projects';
+ }
+}
 </script>
 
 <!-- components/DynamicBreadcrumb.vue -->
@@ -76,6 +81,7 @@ const breadcrumbItems = computed((): BreadcrumbItem[] => {
   <UBreadcrumb
     v-if="breadcrumbItems.length > 0"
     :items="breadcrumbItems"
-    class="py-4"
+    class="py-4 secondary-breadcrumb ml-1"
+    @click="(e) => handleRedirect(e)"
   />
 </template>

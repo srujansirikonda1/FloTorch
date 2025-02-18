@@ -24,7 +24,7 @@ class ExperimentalConfig(BaseModel):
     n_shot_prompts: int = Field(alias="n_shot_prompts")
     n_shot_prompt_guide: Optional[str] = None
     n_shot_prompt_guide_obj: 'NShotPromptGuide' = None
-    knn_num: int = Field(alias="knn_num")
+    knn_num: Union[int, List] = Field(alias="knn_num")
     temp_retrieval_llm: float = Field(alias="temp_retrieval_llm")
     retrieval_service: str = Field(alias="retrieval_service")
     retrieval_model: str = Field(alias="retrieval_model")
@@ -41,10 +41,12 @@ class ExperimentalConfig(BaseModel):
     eval_service: str = 'ragas'
     eval_embedding_model: str = 'amazon.titan-embed-text-v1'
     eval_retrieval_model: str = 'mistral.mixtral-8x7b-instruct-v0:1'
-    eval_retrieval_temperature: float = float(0.4)
+    eval_retrieval_temperature: float = float(0.1) #float(0.4)
     # Rerank model id
     rerank_model_id: str = Field(alias="rerank_model_id", default="none")
     bedrock_knowledge_base: bool = False
+    knowledge_base: bool = True
+    is_opensearch: bool = True
     class Config:
         alias_generator = lambda string: string.replace("-", "_")
         populate_by_name = True

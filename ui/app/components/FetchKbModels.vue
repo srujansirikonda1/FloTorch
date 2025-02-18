@@ -47,19 +47,27 @@ onMounted(() => {
 
   <div class="flex gap-2">
     <UFormField name="kb_data" label=" Bedrock Knowledge Base Data " class="flex-11 text-ellipsis overflow-hidden">
-       <USelectMenu :disabled="!props.region" v-model="selectedModel" :loading="isLoading" :items="modelsList" multiple  class="w-full my-1" value-key="value" @change="emit('kbModels', {value:selectedModel})" />
+      <template #label="{ label }">
+        <div class="flex items-center">
+          {{ label }} <span class="italic"> - required</span>
+          <span class="w-[1px] h-3 ml-2 bg-gray-400"></span>
+          <FieldTooltip @show-tooltip="handleTooltip" field-name="kb_data"/>
+        </div>
+      </template>
+       <USelectMenu :search-input="false" :disabled="!props.region" v-model="selectedModel" :loading="isLoading" :items="modelsList" multiple  class="w-full my-1 primary-dropdown" value-key="value" @change="emit('kbModels', {value:selectedModel})" />
         <p class="my-2 text-red-500" v-if="!props.region">Please select region first </p>
     </UFormField>
-        <UFormField name="refetch_kb_model" label=" " class="flex-1" >
+        <UFormField name="refetch_kb_model" label=" " class="flex-1 relative top-[25px] h-full" >
         <UButton
+          class="primary-btn"
           label="Fetch Bedrock Kb"
           trailing-icon="i-lucide-repeat-2"
           :disabled="!props.region"
           @click.prevent="fetchAllKbModels()"
         />
-        <template #hint>
+        <!-- <template #hint>
           <FieldTooltip field-name="kb_data" />
-        </template>
+        </template> -->
       </UFormField>
     </div>
 

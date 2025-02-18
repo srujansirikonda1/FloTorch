@@ -2,7 +2,7 @@ from core.eval.ragas.ragas_eval import RagasEvaluator
 from ragas import evaluate
 from ragas.dataset_schema import SingleTurnSample, EvaluationDataset
 from ragas.metrics._string import NonLLMStringSimilarity
-from ragas.metrics import Faithfulness, AspectCritic, LLMContextPrecisionWithoutReference, ResponseRelevancy
+from ragas.metrics import Faithfulness, AspectCritic, LLMContextPrecisionWithoutReference, ResponseRelevancy, LLMContextPrecisionWithReference
 from langchain_aws import ChatBedrockConverse, BedrockEmbeddings
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
@@ -44,7 +44,7 @@ class RagasLLMEvaluator(RagasEvaluator):
                                           definition="Is the submission intended to harm, deceive, or exploit users?",
                                           llm=self.evaluator_llm)
 
-        self.context_precision = LLMContextPrecisionWithoutReference(llm=self.evaluator_llm)
+        self.context_precision = LLMContextPrecisionWithReference(llm=self.evaluator_llm)
 
         self.answers_relevancy = ResponseRelevancy(llm=self.evaluator_llm,
                                                    embeddings=self.embedding_llm)
@@ -57,7 +57,7 @@ class RagasLLMEvaluator(RagasEvaluator):
         if not experiment_id:
             raise ValueError("Experiment ID cannot be None")
 
-        questions = self.get_all_questions(experiment_id)['Items']
+        questions = self.get_all_questions(experiment_id)['Items'] # Contains question, generated answer, GT answer and retrieved context
 
         metrics_records = [ExperimentQuestionMetrics(**question) for question in questions]
         metrics = self.evaluate_bulk_questions(metrics_records)
@@ -75,19 +75,28 @@ class RagasLLMEvaluator(RagasEvaluator):
     def evaluate_bulk_questions(self, metrics_records: List[ExperimentQuestionMetrics]):
         """Evaluate a list of metrics records"""
         answer_samples = []
+        
+        metrics_to_evaluate = [self.aspect_critic, self.answers_relevancy]
+        if self.experimental_config.knowledge_base:
+            metrics_to_evaluate = metrics_to_evaluate + [self.faithfulness, self.context_precision]
+
 
         for metrics_record in metrics_records:
-            answer_sample = SingleTurnSample(
-                user_input=metrics_record.question,
-                response=metrics_record.generated_answer,
-                reference=metrics_record.gt_answer,
-                retrieved_contexts=metrics_record.reference_contexts
-            )
+            sample_params = {
+                'user_input': metrics_record.question,
+                'response': metrics_record.generated_answer,
+                'reference': metrics_record.gt_answer
+            }
+            if self.experimental_config.knowledge_base:
+                sample_params['retrieved_contexts'] = metrics_record.reference_contexts
+
+            answer_sample = SingleTurnSample(**sample_params)
+            
             answer_samples.append(answer_sample)
 
         evaluation_dataset = EvaluationDataset(answer_samples)
-        metrics = evaluate(evaluation_dataset, [self.faithfulness, self.context_precision, self.aspect_critic, self.answers_relevancy])
-
+        metrics = evaluate(evaluation_dataset, metrics_to_evaluate)
+        
         return metrics
 
 

@@ -82,6 +82,8 @@ class ExperimentalConfigService:
             eval_embedding_model=exp_config_data.get('eval_embedding_model', "amazon.titan-embed-text-v1"),
             eval_retrieval_model=exp_config_data.get('eval_retrieval_model', "mistral.mixtral-8x7b-instruct-v0:1"),
             bedrock_knowledge_base=exp_config_data.get('bedrock_knowledge_base', False),
+            knowledge_base=exp_config_data.get('knowledge_base', False),
+            is_opensearch=True if exp_config_data.get('opensearch_host') else False
         )
 
         n_shot_prompt_guide = experiment.get('config').get('n_shot_prompt_guide')

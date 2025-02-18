@@ -24,7 +24,7 @@ bedrock_price_df = S3Util().read_csv_from_s3(configs.bedrock_limit_csv_path, S3_
 def is_valid_combination(config, data):
     # Define your rules here
     regions = ["us-east-1", "us-west-2"]
-    if config['bedrock_knowledge_base']:
+    if config['bedrock_knowledge_base'] or not config['knowledge_base']:
         return True
     if config["region"] not in regions:
         return False
@@ -274,7 +274,7 @@ def generate_all_combinations(data):
     [num_prompts, num_chars] = read_gt_data(gt_data)
 
     avg_prompt_length = round(num_chars / num_prompts / 4)
-    if parameters_all["bedrock_knowledge_base"][0]:
+    if parameters_all["bedrock_knowledge_base"][0] or not parameters_all['knowledge_base'][0]:
         num_tokens_kb_data = 0
     else:
         num_tokens_kb_data = count_characters_in_file(parameters_all["kb_data"][0]) / 4
@@ -305,6 +305,7 @@ def generate_all_combinations(data):
 
     if len(valid_configurations) > 0:
         for configuration in valid_configurations:
+            configuration["is_opensearch"] = True if configs.opensearch_host else False
             #TODO: Organize the pricing code, break into static methods
             configuration["directional_pricing"] = 0
             configuration["indexing_cost_estimate"] = 0 
@@ -313,12 +314,12 @@ def generate_all_combinations(data):
             configuration["eval_cost_estimate"] = 0
 
             # kb data tokens would be zero if it is Bedrock knowledge bases
-            effective_num_tokens_kb_data = 0 if configuration["bedrock_knowledge_base"] else estimate_effective_kb_tokens(configuration, num_tokens_kb_data)
+            effective_num_tokens_kb_data = 0 if configuration["bedrock_knowledge_base"] or not configuration["knowledge_base"] else estimate_effective_kb_tokens(configuration, num_tokens_kb_data)
 
             indexing_time, retrieval_time, eval_time = estimate_times(effective_num_tokens_kb_data, num_prompts, configuration)
 
             # Bedrock knowledge bases price not supported at the moment
-            if configuration["bedrock_knowledge_base"]:
+            if configuration["bedrock_knowledge_base"] or not configuration["knowledge_base"]:
                 configuration["indexing_cost_estimate"] = 0
             elif configuration['embedding_service'] == "bedrock" :
                 embedding_price = estimate_embedding_model_bedrock_price(bedrock_price_df, configuration, num_tokens_kb_data)
@@ -349,7 +350,7 @@ def generate_all_combinations(data):
             configuration["eval_cost_estimate"] += estimate_fargate_price(eval_time)
 
             # add opensearch provisioned costs
-            if not configuration["bedrock_knowledge_base"]:
+            if not configuration["bedrock_knowledge_base"] or configuration["is_opensearch"]:
                 configuration["indexing_cost_estimate"] += estimate_opensearch_price(indexing_time)
                 configuration["retrieval_cost_estimate"] += estimate_opensearch_price(retrieval_time)
                 configuration["eval_cost_estimate"] += estimate_opensearch_price(eval_time)
@@ -358,7 +359,7 @@ def generate_all_combinations(data):
             configuration["directional_pricing"] +=configuration["directional_pricing"]*0.05 #extra
             configuration["directional_pricing"] = round(configuration["directional_pricing"],2)    
 
-    return valid_configurations
+    return valid_configurations[:1000]
 
 def generate_all_combinations_in_background(execution_id: str, execution_config_data):
     """       

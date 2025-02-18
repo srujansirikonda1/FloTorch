@@ -12,8 +12,11 @@ const modelValue = defineModel<ProjectCreateDataStrategy>({
 //   queryKey: ["presignedUploadUrl"],
 //   queryFn: () => usePresignedUploadUrl(),
 // })
+const emits = defineEmits(["next", "previous", "kbFilesUpload", "showTooltip"]);
 
 const presignedUploadUrl = ref();
+
+const kbConfig = ref(true);
 
 const {
   mutateAsync: getPresignedUploadUrl,
@@ -21,6 +24,8 @@ const {
 } = useMutation({
   mutationFn: async (uuid: string) => {
     const response = await usePresignedUploadUrl(uuid);
+    const kbResponse = await useKBConfig();
+    kbConfig.value = kbResponse?.opensearch?.configured ;
     presignedUploadUrl.value = response;
     return response;
   },
@@ -29,6 +34,10 @@ const {
 onMounted(() => {
   getPresignedUploadUrl(props.fileUploadId as string);
 });
+
+const handleTooltip = (tooltipInfo: string) => {
+  emits('showTooltip', tooltipInfo)
+}
 
 const props = withDefaults(
   defineProps<{
@@ -58,7 +67,6 @@ const state = reactive<Partial<ProjectCreateDataStrategy>>({
   // kb_data_uploadedFiles: modelValue.value?.kb_data_uploadedFiles || undefined,
 });
 
-const emits = defineEmits(["next", "previous", "kbFilesUpload"]);
 
 const onSubmit = (event: FormSubmitEvent<ProjectCreateDataStrategy>) => {
     modelValue.value = event.data;
@@ -72,8 +80,22 @@ const updateKbModels = (event: any) => {
 };
 
 const resetKbModel = (event: any) => {
+  if(state.kb_model === 'none'){
+    state.kb_data = "none"
+  }else{
   state.kb_data = [];
+  }
 };
+
+const disbleDefaultKbOption = computed(()=>{
+    return meta.kb_model.map(item => {
+      if (!kbConfig.value && item.value == 'default-upload') {
+        item['disabled'] = true; 
+      }
+      return item;
+    });
+})
+
 </script>
 
 <template>
@@ -83,50 +105,84 @@ const resetKbModel = (event: any) => {
     :validate-on="['input']"
     @submit="onSubmit"
   >
-    <UFormField id="name" name="name" label="Project Name" required>
-      <UInput v-model="state.name" type="text" />
-      <template #hint>
+    <UFormField id="name" name="name" label="Project Name">
+      <template #label="{ label }">
+        <div class="flex items-center">
+          {{ label }} <span class="italic"> - required</span>
+          <!-- <span class="w-[1px] h-3 ml-2 bg-gray-400"></span> -->
+          <!-- <FieldTooltip @show-tooltip="handleTooltip" field-name="name"/> -->
+        </div>
+      </template>
+      <UInput v-model="state.name" type="text">
+        </UInput>
+      
+      <!-- <template #hint>
         <FieldTooltip field-name="name" />
-      </template>
+      </template> -->
     </UFormField>
-    <UFormField id="region" name="region" label="Region" required>
-      <RegionSelect v-model="state.region" />
-      <template #hint>
-        <FieldTooltip field-name="region" />
+    <UFormField id="region" name="region" label="Region">
+      <template #label="{ label }">
+        <div class="flex items-center">
+          {{ label }} <span class="italic"> - required</span>
+          <span class="w-[1px] h-3 ml-2 bg-gray-400"></span>
+          <!-- <USeparator orientation="vertical" class="h-3 ml-4" /> -->
+          <FieldTooltip @show-tooltip="handleTooltip" field-name="region"/>
+        </div>
       </template>
+      <RegionSelect v-model="state.region" />
+      
     </UFormField>
 
     <UFormField
       id="kb_model"
       name="kb_model"
       label="Select Knowledge Base Type"
-      required
+      
     >
+      <template #label="{ label }">
+        <div class="flex items-center">
+          {{ label }} <span class="italic"> - required</span>
+          <span class="w-[1px] h-3 ml-2 bg-gray-400"></span>
+          <FieldTooltip @show-tooltip="handleTooltip" field-name="kb_model"/>
+        </div>
+      </template>
       <USelectMenu
-        :items="meta.kb_model"
+        :items="disbleDefaultKbOption"
         v-model="state.kb_model"
-        class="w-full"
+        class="w-full primary-dropdown"
         value-key="value"
         @change="resetKbModel"
-        
-      />
-      <template #hint>
-        <FieldTooltip field-name="kb_model" />
-      </template>
-       <div v-if="state.kb_model && state.kb_model !== 'default-upload'" class="my-2" >
+        :loading="isFetchingPresignedUploadUrl"
+        :disabled="isFetchingPresignedUploadUrl"
+        :search-input="false"
+     />
+      <div class="flex mt-2" v-if="!kbConfig">
+         <div class="flex items-center"> Upload my own data not available. <FieldTooltip @show-tooltip="handleTooltip" field-name="no_own_data"/> </div>
+      </div>
+      <div v-if="state.kb_model && state.kb_model !== 'default-upload' && state.kb_model !== 'none'" class="my-2" >
           <ULink class="text-blue-500 hover:underline" target="_blank" raw :to="`https://${state.region}.console.aws.amazon.com/bedrock/home?region=${state.region}#/knowledge-bases`" active-class="font-bold" inactive-class="text-[var(--ui-text-muted)]">Create Bedrock Knowledge Bases</ULink>
-        </div>
-    </UFormField>
-      <p v-if="state.kb_model && state.kb_model !== 'default-upload'" class="text-blue-500">[Note]: Indexing Strategy step will be skipped if Bedrock Knowledge Bases is selected </p>
+      </div>
+      <p class="font-bold" v-if="state.kb_model && state.kb_model !== 'default-upload' &&  state.kb_model !=='none'" >[Note]: Indexing Strategy step will be skipped if Bedrock Knowledge Bases is selected </p>
+      <p class="font-bold" v-if="state.kb_model && state.kb_model !== 'default-upload' &&  state.kb_model ==='none'" >[Note]: Indexing Strategy step will be skipped if you don't select any Knowledge Base Type </p>
 
-    <template v-if="state.kb_model && state.kb_model === 'default-upload'">
+    </UFormField>
+     
+
+    <template v-if="state.kb_model && state.kb_model === 'default-upload' && state.kb_model !== 'none'">
       <UFormField
         id="kb_data"
         name="kb_data"
         label="Knowledge Base Data"
       >
-      <template #hint>
+      <!-- <template #hint>
           <FieldTooltip field-name="kb_data" />
+        </template> -->
+        <template #label="{ label }">
+          <div class="flex items-center">
+            {{ label }} <span class="italic"> - required</span>
+          <span class="w-[1px] h-3 ml-2 bg-gray-400"></span>
+            <FieldTooltip @show-tooltip="handleTooltip" field-name="kb_data"/>
+          </div>
         </template>
         <FileUploadKb
           @kbFiles="fetchKbFiles"
@@ -138,7 +194,7 @@ const resetKbModel = (event: any) => {
         /> 
       </UFormField>
     </template>
-    <template v-if="state.kb_model && state.kb_model !== 'default-upload'">
+    <template v-if="state.kb_model && state.kb_model !== 'default-upload' && state.kb_model !== 'none'">
         <FetchKbModels
           @kbModels="updateKbModels"
           v-model="state.kb_data"
@@ -148,7 +204,14 @@ const resetKbModel = (event: any) => {
         />
 
     </template>
-    <UFormField id="gt_data" name="gt_data" label="Ground Truth Data" required>
+    <UFormField id="gt_data" name="gt_data" label="Ground Truth Data" >
+      <template #label="{ label }">
+        <div class="flex items-center">
+          {{ label }} <span class="italic"> - required</span>
+          <span class="w-[1px] h-3 ml-2 bg-gray-400"></span>
+          <FieldTooltip @show-tooltip="handleTooltip" field-name="gt_data"/>
+        </div>
+      </template>
       <FileUpload
         v-if="presignedUploadUrl?.gt_data"
         key="gt_data"
@@ -156,9 +219,9 @@ const resetKbModel = (event: any) => {
         accept="application/json"
         :data="presignedUploadUrl.gt_data"
       />
-      <template #hint>
+      <!-- <template #hint>
         <FieldTooltip field-name="gt_data" />
-      </template>
+      </template> -->
     </UFormField>
     <div class="flex justify-between items-center w-full mt-6">
       <div>
@@ -167,7 +230,7 @@ const resetKbModel = (event: any) => {
           type="button"
           icon="i-lucide-arrow-left"
           label="Back"
-          variant="outline"
+          class="secondary-btn"
           @click.prevent="emits('previous')"
         />
       </div>
@@ -176,6 +239,7 @@ const resetKbModel = (event: any) => {
           trailing-icon="i-lucide-arrow-right"
           :label="nextButtonLabel"
           type="submit"
+          class="primary-btn"
         />
       </div>
     </div>

@@ -29,7 +29,7 @@ const handleAlertClose = () => {
 
 
 const hideInfraAlert = computed(() => {
-  if (isInfraAlertHidden.value) {
+  if (isInfraAlertHidden.value === true) {
     return true
   }
   if (route.matched.some((route) => route.meta.hideInfraAlert)) {
@@ -37,14 +37,30 @@ const hideInfraAlert = computed(() => {
   }
   return false
 })
+
+const sharedData = inject('sharedData')
+
+
+watch(route, () => {
+  isInfraAlertHidden.value = false;
+})
+
+onMounted(() => {
+  sharedData.value.title = title
+  sharedData.value.to = { name: 'projects-id', params: { id: projectId } }
+  sharedData.value.description = description
+});
+
 </script>
 
 
 
 <template>
   <div>
-    <div v-if="!hideInfraAlert" class="mb-4">
-      <UAlert variant="subtle" title="Heads Up!" :close="{
+    <div v-if="!hideInfraAlert" class="-mb-2 mt-5">
+      <UAlert class="info-alert" variant="subtle" icon="i-lucide-info"  :close="{
+        icon: 'i-lucide-x',
+        color: 'var(--aws-info-alert-color)',
         onClick: () => {
           handleAlertClose()
         }

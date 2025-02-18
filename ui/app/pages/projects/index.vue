@@ -19,18 +19,33 @@ const { data: projects, isLoading } = useQuery({
 useHead({
   title: "Projects",
 })
+const sharedData = inject('sharedData')
+
+const route = useRoute();
+
+watch(route, () => {
+  sharedData.value.title = "Projects"
+})
+
+onMounted(() => {
+  sharedData.value.title = "Projects"
+});
 </script>
 
 <template>
   <Page title="Projects">
     <Breadcumb />
     <template #actions>
-      <ProjectUploadConfigButton />
-      <UButton
+      <div class="flex justify-end gap-2 w-full mt-2">
+        <UButton
+        class="primary-btn"
         icon="i-lucide-plus"
         :to="{ name: 'projects-create' }"
-        label="Create Project"
-      />
+          label="Create Project"
+        />
+        <ProjectUploadConfigButton />
+      </div>
+
     </template>
     <UCard>
       <div v-if="isLoading" class="flex justify-center items-center h-24">
