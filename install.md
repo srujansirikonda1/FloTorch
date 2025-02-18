@@ -89,10 +89,6 @@ Irrespective of the approach, below are the pre-requisites:
 | | Mistral AI/mistral.mistral-7b-instruct-v0:2 |
 | | Mistral AI/mistral.mistral-large-2402-v1:0 |
 
-3. AWS Marketplace Subscription (see next section)
-4. Docker installed (if you plan to build and push custom images)
-
-
 
 ## Installation Guide
 
