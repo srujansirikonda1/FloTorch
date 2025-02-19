@@ -320,7 +320,7 @@ Resources:
                 "ResultPath": "$.indexCreation",
                 "Resource": "arn:aws:states:::lambda:invoke",
                 "Parameters": {
-                  "FunctionName": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${RuntimeLambdaName}${Suffix}",
+                  "FunctionName": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${RuntimeLambdaName}${Suffix}${ESSuffix}",
                   "Payload.$": "$"
                 }
               },
@@ -1503,7 +1503,7 @@ Resources:
                       "ResultPath": "$.costEstimation",
                       "Resource": "arn:aws:states:::lambda:invoke",
                       "Parameters": {
-                        "FunctionName": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CostComputeLambdaName}${Suffix}",
+                        "FunctionName": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CostComputeLambdaName}${Suffix}${ESSuffix}",
                         "Payload": {
                           "experiment_id.$": "$.parsedConfig.parsed_config.experiment_id",
                           "aws_region.$": "$.parsedConfig.parsed_config.aws_region",
@@ -1626,6 +1626,7 @@ Resources:
           RuntimeLambdaName: !Ref RuntimeLambdaName
           CostComputeLambdaName: !Ref CostComputeLambdaName
           Suffix: !If [PrerequisitesMet, "-withPrereqs", "-noPrereqs"]
+          ESSuffix: !If [CreateOpenSearchStack, "-withopensearch", "-noopensearch"]
           subnets_array: !Join ["", ["[\"", !Join ["\",\"", !Ref PrivateSubnets], "\"]"]]
           security_groups: !Ref SecurityGroups
           InferenceSystemPrompt: !Ref InferenceSystemPrompt

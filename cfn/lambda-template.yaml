@@ -538,7 +538,10 @@ Resources:
     Condition: PrerequisitesMet
     DependsOn: DockerPullPushResource
     Properties:
-      FunctionName: !Sub flotorch-runtime-${TableSuffix}-WithPrereqs
+      FunctionName: !If 
+        - HasOpenSearch
+        - !Sub flotorch-runtime-${TableSuffix}-WithPrereqs-withopensearch
+        - !Sub flotorch-runtime-${TableSuffix}-WithPrereqs-noopensearch
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-runtime-${TableSuffix}:latest
@@ -568,7 +571,10 @@ Resources:
     Type: AWS::Lambda::Function
     Condition: PrerequisitesNotMet
     Properties:
-      FunctionName: !Sub flotorch-runtime-${TableSuffix}-NoPrereqs
+      FunctionName: !If 
+        - HasOpenSearch
+        - !Sub flotorch-runtime-${TableSuffix}-NoPrereqs-withopensearch
+        - !Sub flotorch-runtime-${TableSuffix}-NoPrereqs-noopensearch
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-runtime-${TableSuffix}:latest
@@ -599,7 +605,10 @@ Resources:
     Condition: PrerequisitesMet
     DependsOn: DockerPullPushResource
     Properties:
-      FunctionName: !Sub flotorch-costcompute-${TableSuffix}-WithPrereqs
+      FunctionName: !If 
+        - HasOpenSearch
+        - !Sub flotorch-costcompute-${TableSuffix}-WithPrereqs-withopensearch
+        - !Sub flotorch-costcompute-${TableSuffix}-WithPrereqs-noopensearch
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:latest
@@ -624,7 +633,10 @@ Resources:
     Type: AWS::Lambda::Function
     Condition: PrerequisitesNotMet
     Properties:
-      FunctionName: !Sub flotorch-costcompute-${TableSuffix}-NoPrereqs
+      FunctionName: !If 
+        - HasOpenSearch
+        - !Sub flotorch-costcompute-${TableSuffix}-NoPrereqs-withopensearch
+        - !Sub flotorch-costcompute-${TableSuffix}-NoPrereqs-noopensearch
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:latest
