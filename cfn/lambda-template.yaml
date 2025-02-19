@@ -84,17 +84,28 @@ Parameters:
     AllowedValues: 
       - "yes"
       - "no"
+  NeedOpensearch:
+    Type: String
+    Description: Whether to deploy OpenSearch (yes/no)
+    AllowedValues: 
+      - "yes"
+      - "no"
+    Default: "no"
 
 Conditions:
   PrerequisitesMet: !Equals [!Ref PrerequisitesMet, "yes"]
   PrerequisitesNotMet: !Equals [!Ref PrerequisitesMet, "no"]
+  HasOpenSearch: !Equals [!Ref NeedOpensearch, "yes"]
 
 Resources:
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Lambda functions
-      GroupName: !Sub LambdaSecurityGroup-${TableSuffix}
+      GroupName: !If 
+        - HasOpenSearch
+        - !Sub FlotorchLambdaSecurityGroup-${TableSuffix}-withopensearch
+        - !Sub FlotorchLambdaSecurityGroup-${TableSuffix}-noopensearch
       VpcId: !Ref VpcId
       SecurityGroupEgress:
         - IpProtocol: -1
@@ -105,7 +116,10 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub FlotorchLambdaRole-${TableSuffix}
+      RoleName: !If 
+        - HasOpenSearch
+        - !Sub FlotorchLambdaRole-${TableSuffix}-withopensearch
+        - !Sub FlotorchLambdaRole-${TableSuffix}-noopensearch
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -524,7 +538,7 @@ Resources:
     Condition: PrerequisitesMet
     DependsOn: DockerPullPushResource
     Properties:
-      FunctionName: !Sub flotorch-runtime-${TableSuffix}
+      FunctionName: !Sub flotorch-runtime-${TableSuffix}-WithPrereqs
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-runtime-${TableSuffix}:latest
@@ -554,7 +568,7 @@ Resources:
     Type: AWS::Lambda::Function
     Condition: PrerequisitesNotMet
     Properties:
-      FunctionName: !Sub flotorch-runtime-${TableSuffix}
+      FunctionName: !Sub flotorch-runtime-${TableSuffix}-NoPrereqs
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-runtime-${TableSuffix}:latest
@@ -585,7 +599,7 @@ Resources:
     Condition: PrerequisitesMet
     DependsOn: DockerPullPushResource
     Properties:
-      FunctionName: !Sub flotorch-costcompute-${TableSuffix}
+      FunctionName: !Sub flotorch-costcompute-${TableSuffix}-WithPrereqs
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:latest
@@ -610,7 +624,7 @@ Resources:
     Type: AWS::Lambda::Function
     Condition: PrerequisitesNotMet
     Properties:
-      FunctionName: !Sub flotorch-costcompute-${TableSuffix}
+      FunctionName: !Sub flotorch-costcompute-${TableSuffix}-NoPrereqs
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-costcompute-${TableSuffix}:latest
