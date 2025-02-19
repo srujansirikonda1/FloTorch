@@ -58,7 +58,6 @@ Resources:
     Type: AWS::OpenSearchService::Domain
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
-    DependsOn: OpenSearchServiceLinkedRole
     Properties:
       DomainName: !Sub flotorch-${TableSuffix}
       EngineVersion: OpenSearch_2.17
