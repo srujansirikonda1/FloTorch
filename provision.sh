@@ -154,20 +154,20 @@ update_cfn_stack() {
     fi
 }
 
-# Function to create OpenSearch service-linked role
-create_opensearch_service_role() {
-    echo "Creating OpenSearch service-linked role..."
-    aws iam get-role --role-name "AWSServiceRoleForAmazonOpenSearchService" >/dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        aws iam create-service-linked-role --aws-service-name es.amazonaws.com || {
-            echo "Failed to create OpenSearch service-linked role"
-            return 1
-        }
-        echo "OpenSearch service-linked role created successfully"
-    else
-        echo "OpenSearch service-linked role already exists"
-    fi
-}
+# # Function to create OpenSearch service-linked role
+# create_opensearch_service_role() {
+#     echo "Creating OpenSearch service-linked role..."
+#     aws iam get-role --role-name "AWSServiceRoleForAmazonOpenSearchService" >/dev/null 2>&1
+#     if [ $? -ne 0 ]; then
+#         aws iam create-service-linked-role --aws-service-name es.amazonaws.com || {
+#             echo "Failed to create OpenSearch service-linked role"
+#             return 1
+#         }
+#         echo "OpenSearch service-linked role created successfully"
+#     else
+#         echo "OpenSearch service-linked role already exists"
+#     fi
+# }
 
 # Check if any environments exist
 if [ -d ".envs" ] && [ "$(ls -A .envs 2>/dev/null)" ]; then
@@ -257,11 +257,11 @@ if [ "$NEED_OPENSEARCH" = "yes" ]; then
     read -p "Enter OpenSearch admin username [admin]: " OPENSEARCH_USER
     OPENSEARCH_USER=${OPENSEARCH_USER:-admin}
     
-    # Create OpenSearch service-linked role if needed
-    create_opensearch_service_role || {
-        echo "Failed to create OpenSearch service-linked role. Please ensure you have sufficient IAM permissions."
-        exit 1
-    }
+    # # Create OpenSearch service-linked role if needed
+    # create_opensearch_service_role || {
+    #     echo "Failed to create OpenSearch service-linked role. Please ensure you have sufficient IAM permissions."
+    #     exit 1
+    # }
     read -s -p "Enter OpenSearch admin password: " OPENSEARCH_PASSWORD
     echo
 fi
