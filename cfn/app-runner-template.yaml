@@ -273,9 +273,15 @@ Resources:
               - Name: sagemaker_role_arn
                 Value: !Ref BedrockRoleArn
               - Name: STEP_FUNCTION_ARN
-                Value: !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}
+                Value: !If 
+                  - HasOpenSearch
+                  - !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}-withopensearch
+                  - !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}-noopensearch
               - Name: step_function_arn
-                Value: !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}
+                Value: !If 
+                  - HasOpenSearch
+                  - !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}-withopensearch
+                  - !Sub arn:aws:states:${Region}:${AccountId}:stateMachine:FlotorchStateMachine-${TableSuffix}-noopensearch
 
 Outputs:
   ServiceUrl:
