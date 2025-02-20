@@ -144,6 +144,7 @@ update_cfn_stack() {
         --stack-name "$stack_name" \
         --template-url "https://flotorch-public.s3.us-east-1.amazonaws.com/${version}/templates/master-template.yaml" \
         --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+        --disable-rollback \
         --region "$region"
     
     if [ $? -eq 0 ]; then
@@ -280,6 +281,7 @@ update_environment() {
         --stack-name $PROJECT_NAME \
         --template-url "https://flotorch-public.s3.us-east-1.amazonaws.com/${VERSION}/templates/master-template.yaml" \
         --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+        --disable-rollback \
         --region "$REGION" \
         --parameters \
             ParameterKey=PrerequisitesMet,ParameterValue="$PREREQUISITES_MET" \
@@ -421,6 +423,7 @@ aws cloudformation create-stack \
     --stack-name $PROJECT_NAME \
     --template-url "https://flotorch-public.s3.us-east-1.amazonaws.com/${VERSION}/templates/master-template.yaml" \
     --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+    --disable-rollback \
     --region "$REGION" \
     --parameters \
         ParameterKey=PrerequisitesMet,ParameterValue="$PREREQUISITES_MET" \

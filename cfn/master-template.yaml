@@ -307,6 +307,7 @@ Resources:
         OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
         SageMakerRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         PrerequisitesMet: !Ref PrerequisitesMet
+        NeedOpensearch: !Ref NeedOpensearch
 
   StateMachineStackNoOpenSearch:
     Type: AWS::CloudFormation::Stack
@@ -336,6 +337,7 @@ Resources:
         OpenSearchAdminUser: ""
         OpenSearchAdminPassword: ""
         SageMakerRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
+        NeedOpensearch: !Ref NeedOpensearch
 
   AppRunnerStack:
     Type: AWS::CloudFormation::Stack
