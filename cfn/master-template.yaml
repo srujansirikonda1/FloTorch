@@ -146,6 +146,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateOpenSearchStack
     DependsOn: [VPCStack]
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/opensearch-template.yaml
       Parameters:
@@ -163,7 +165,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateOpenSearchStack
     DependsOn: [VPCStack, DynamoDBStack, OpenSearchStack]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/lambda-template.yaml
       Parameters:
@@ -199,7 +201,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateNoOpenSearchStack
     DependsOn: [VPCStack, DynamoDBStack]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/lambda-template.yaml
       Parameters:
@@ -235,7 +237,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateOpenSearchStack
     DependsOn: [VPCStack, DynamoDBStack, OpenSearchStack]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/ecs-template.yaml
       Parameters:
@@ -259,7 +261,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateNoOpenSearchStack
     DependsOn: [VPCStack, DynamoDBStack]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/ecs-template.yaml
       Parameters:
@@ -282,7 +284,7 @@ Resources:
   StateMachineStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateOpenSearchStack
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     DependsOn: [VPCStack, ECSStack, LambdaStack, DynamoDBStack, OpenSearchStack]
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/state-machine-template.yaml
@@ -313,7 +315,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateNoOpenSearchStack
     DependsOn: [VPCStack, ECSStackNoOpenSearch, LambdaStackNoOpenSearch, DynamoDBStack]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/state-machine-template.yaml
       Parameters:
@@ -342,8 +344,8 @@ Resources:
   AppRunnerStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateOpenSearchStack
+    DeletionPolicy: Delete
     DependsOn: [DynamoDBStack, OpenSearchStack, StateMachineStack]
-    DeletionPolicy: Retain
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/app-runner-template.yaml
       Parameters:
@@ -361,12 +363,13 @@ Resources:
         BedrockRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         EcrRepositoryUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-app-${TableSuffix}"
         AppImageTag: "2.1.0"
+        NeedOpensearch: !Ref NeedOpensearch
 
   AppRunnerStackNoOpenSearch:
     Type: AWS::CloudFormation::Stack
     Condition: CreateNoOpenSearchStack
     DependsOn: [DynamoDBStack, StateMachineStackNoOpenSearch]
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub https://flotorch-public.s3.us-east-1.amazonaws.com/test-cfn/templates/app-runner-template.yaml
       Parameters:
@@ -384,6 +387,7 @@ Resources:
         BedrockRoleArn: !GetAtt VPCStack.Outputs.BedrockRoleArn
         EcrRepositoryUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/flotorch-app-${TableSuffix}"
         AppImageTag: "2.1.0"
+        NeedOpensearch: !Ref NeedOpensearch
 
 Outputs:
   AppRunnerServiceUrl:
