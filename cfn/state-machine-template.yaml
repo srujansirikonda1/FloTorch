@@ -655,7 +655,7 @@ Resources:
                         "Overrides": {
                           "ContainerOverrides": [
                             {
-                              "Name": "FlotorchContainerIndexing-${TableSuffix}",
+                              "Name": "${ContainerIndexingName}",
                               "Environment": [
                                 {
                                   "Name": "EXECUTION_ID",
@@ -873,7 +873,7 @@ Resources:
                         "Overrides": {
                           "ContainerOverrides": [
                             {
-                              "Name": "FlotorchContainerRetriever-${TableSuffix}",
+                              "Name": "${ContainerRetrieverName}",
                               "Environment": [
                                 {
                                   "Name": "EXECUTION_ID",
@@ -1307,7 +1307,7 @@ Resources:
                         "Overrides": {
                           "ContainerOverrides": [
                             {
-                              "Name": "FlotorchContainerEvaluation-${TableSuffix}",
+                              "Name": "${ContainerEvaluationName}",
                               "Environment": [
                                 {
                                   "Name": "EXECUTION_ID",
@@ -1647,6 +1647,9 @@ Resources:
           security_groups: !Ref SecurityGroups
           InferenceSystemPrompt: !Ref InferenceSystemPrompt
           SageMakerRoleArn: !Ref SageMakerRoleArn
+          ContainerIndexingName: !If [HasOpenSearch, !Sub "FlotorchContainerIndexing-${TableSuffix}-withopensearch", !Sub "FlotorchContainerIndexing-${TableSuffix}-noopensearch"]
+          ContainerRetrieverName: !If [HasOpenSearch, !Sub "FlotorchContainerRetriever-${TableSuffix}-withopensearch", !Sub "FlotorchContainerRetriever-${TableSuffix}-noopensearch"]
+          ContainerEvaluationName: !If [HasOpenSearch, !Sub "FlotorchContainerEvaluation-${TableSuffix}-withopensearch", !Sub "FlotorchContainerEvaluation-${TableSuffix}-noopensearch"]
 
 Outputs:
   StateMachineArn:
