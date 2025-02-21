@@ -5,6 +5,20 @@ Parameters:
   TableSuffix:
     Type: String
     Description: Suffix to append to resource names
+  PrerequisitesMet:
+    Type: String
+    Description: Whether prerequisites are met (yes/no)
+    AllowedValues:
+      - "yes"
+      - "no"
+    Default: "no"
+  NeedOpensearch:
+    Type: String
+    Description: Whether to deploy OpenSearch cluster (yes/no)
+    AllowedValues:
+      - "yes"
+      - "no"
+    Default: "no"
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where Lambda functions will be deployed
@@ -78,19 +92,6 @@ Parameters:
   CostComputeImageTag:
     Type: String
     Description: Tag for the AI image
-  PrerequisitesMet:
-    Type: String
-    Description: Whether prerequisites are met (yes/no)
-    AllowedValues: 
-      - "yes"
-      - "no"
-  NeedOpensearch:
-    Type: String
-    Description: Whether to deploy OpenSearch (yes/no)
-    AllowedValues: 
-      - "yes"
-      - "no"
-    Default: "no"
 
 Conditions:
   PrerequisitesMet: !Equals [!Ref PrerequisitesMet, "yes"]

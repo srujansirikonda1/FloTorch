@@ -5,6 +5,13 @@ Parameters:
   TableSuffix:
     Type: String
     Description: Suffix to append to table names
+  NeedOpensearch:
+    Type: String
+    Description: Whether to deploy OpenSearch cluster (yes/no)
+    AllowedValues:
+      - "yes"
+      - "no"
+    Default: "no"
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where resources will be deployed
@@ -70,13 +77,6 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
-  NeedOpensearch:
-    Type: String
-    Description: Whether to deploy OpenSearch cluster (yes/no)
-    AllowedValues:
-      - "yes"
-      - "no"
-    Default: "no"
 
 Conditions:
   PrerequisitesMet: !Equals [!Ref PrerequisitesMet, "yes"]
@@ -1641,7 +1641,7 @@ Resources:
           OpenSearchAdminPassword: !Ref OpenSearchAdminPassword
           RuntimeLambdaName: !Ref RuntimeLambdaName
           CostComputeLambdaName: !Ref CostComputeLambdaName
-          Suffix: !If [PrerequisitesMet, "-withPrereqs", "-noPrereqs"]
+          Suffix: !If [PrerequisitesMet, "-WithPrereqs", "-NoPrereqs"]
           ESSuffix: !If [HasOpenSearch, "-withopensearch", "-noopensearch"]
           subnets_array: !Join ["", ["[\"", !Join ["\",\"", !Ref PrivateSubnets], "\"]"]]
           security_groups: !Ref SecurityGroups
