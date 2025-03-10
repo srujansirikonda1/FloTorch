@@ -10,10 +10,6 @@ from fastapi.responses import JSONResponse
 
 # Setup flotorch-core path
 import sys, os
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../flotorch_core")))
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../flotorch-core")))
-sys.path.insert(0, os.path.abspath("../flotorch-core"))
-
 
 from storage.storage_provider_factory import StorageProviderFactory
 from inferencer.inferencer_provider_factory import InferencerProviderFactory
@@ -23,7 +19,6 @@ from retriever.retriever import Retriever
 from reader.json_reader import JSONReader
 from core.dynamodb import DynamoDBOperations
 from inferencer import bedrock_inferencer
-from FLconfig.config import get_config
 from ..dependencies.database import get_experiment_db
 from boto3.dynamodb.conditions import Key
 from typing import List, Dict
@@ -39,9 +34,6 @@ from embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTE
 # Flotorch-core config
 env_config_provider = EnvConfigProvider()
 config = Config(env_config_provider)
-
-# Flotorch config
-configs = get_config()
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
