@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel
+from typing import List, Dict
+from pydantic import BaseModel, RootModel
 import logging
 import asyncio
 
@@ -8,20 +8,10 @@ from http.client import HTTPException
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-# Setup flotorch-core path
-import sys, os
-
-from storage.storage_provider_factory import StorageProviderFactory
 from inferencer.inferencer_provider_factory import InferencerProviderFactory
 from storage.db.vector.vector_storage_factory import VectorStorageFactory
 from embedding.embedding_registry import embedding_registry
-from retriever.retriever import Retriever
-from reader.json_reader import JSONReader
-from core.dynamodb import DynamoDBOperations
-from inferencer import bedrock_inferencer
-from ..dependencies.database import get_experiment_db
-from boto3.dynamodb.conditions import Key
-from typing import List, Dict
+from storage.db.dynamodb import DynamoDB
 from config.config import Config
 from config.env_config_provider import EnvConfigProvider
 from chunking.chunking import Chunk
@@ -43,46 +33,40 @@ class ExperimentQuery(BaseModel):
     experiment_ids: List[str]
     query: str
     
+class VotePayload(RootModel):
+    root: Dict[str, int]
+    
+    
+def get_experiment_db():
+    return DynamoDB(config.get_experiment_table_name())
 
-def get_experiment_configs(experiment_db, experiment_ids: List[str]) -> List[Dict]:
+def get_experiment_configs(experiment_db: DynamoDB, experiment_ids: List[str]) -> List[Dict]:
     """
     Get the experiment configs for all experiments using their IDs.
 
     Args:
-        experiment_db: Instance of DynamoDBOperations.
+        experiment_db: Instance of DynamoDB.
         experiment_ids (List[str]): List of experiment IDs.
 
     Returns:
         List[Dict]: List of JSON objects for each experiment.
     """
-    experiments = []  # List to store results
-    
+    experiments = []
     for experiment_id in experiment_ids:
-        key_condition_expression = "id = :id"
-        expression_values = {":id": experiment_id}
-        
         try:
-            # Query DynamoDB for the current experiment ID
-            response = experiment_db.query(
-                key_condition_expression=key_condition_expression,
-                expression_values=expression_values
-            )
-            
-            # Add the items to the results list
-            items = response.get('Items', [])
-            experiments.extend(items)  # Add all matching items to the list
-            
+            item = experiment_db.read({'id': experiment_id})
+            if item:
+                experiments.append(item)
         except Exception as e:
-            print(f"Error querying DynamoDB for ID {experiment_id}: {str(e)}")
-    
+            print(f"Error reading from DynamoDB for ID {experiment_id}: {str(e)}")
     return experiments
+
 
 @router.post("/heval/query-experiments", tags=["heval"])
 async def query_experiments(
     query: ExperimentQuery,
-    experiment_db: DynamoDBOperations = Depends(get_experiment_db)
+    experiment_db: DynamoDB = Depends(get_experiment_db)
 ):
-
     num_experiments = len(query.experiment_ids)
     if not (2 <= num_experiments <= 3):
         raise HTTPException(
@@ -96,7 +80,7 @@ async def query_experiments(
         experiment_id = exp_config_data.get("id")
         exp_config = exp_config_data.get("config")
 
-        # Common Configurations
+        # Configurations
         aws_region = exp_config.get("aws_region")
         knowledge_base = exp_config.get("knowledge_base", False)
         bedrock_knowledge_base = exp_config.get("bedrock_knowledge_base", False)
@@ -147,7 +131,7 @@ async def query_experiments(
             )
         else:
             metadata, answer = await asyncio.to_thread(
-                inferencer.generate_text, query.query
+                inferencer.generate_text, query.query, None
             )
 
         return {
@@ -159,3 +143,72 @@ async def query_experiments(
     results = await asyncio.gather(*[run_experiment(exp) for exp in experiment_configs])
 
     return JSONResponse(content={"results": results})
+
+    
+@router.post("/heval/upvote", tags=["heval"])
+async def vote(
+    vote_data: VotePayload,
+    experiment_db: DynamoDB = Depends(get_experiment_db)
+    ):
+    
+    # Validate payload is not empty
+    votes = vote_data.root
+    if not votes:
+        raise HTTPException(status_code=400, detail="Vote payload cannot be empty")
+        
+    results = {}
+    
+    try:
+        for exp_id, vote in votes.items():
+            # Validate experiment ID is not empty
+            if not exp_id:
+                raise HTTPException(status_code=400, detail="Experiment ID cannot be empty")
+                
+            # Validate vote value
+            if vote not in [0, 1]:
+                raise HTTPException(status_code=400, detail=f"Invalid vote value for {exp_id}. Must be 0 or 1.")
+            
+            # Check if experiment record exists
+            key = {'id': exp_id}
+            item = experiment_db.read(key)
+            
+            if item:
+                # Record exists, update the score
+                current_score = item.get("scores", 0)
+                new_score = current_score + vote
+                
+                # Prepare data for update
+                update_data = {"scores": new_score}
+                
+                try:
+                    success = experiment_db.update(
+                        key=key,
+                        data=update_data
+                    )
+                    if not success:
+                        logger.error(f"Failed to update score for {exp_id}")
+                        raise HTTPException(status_code=500, detail=f"Database update failed for {exp_id}")
+                except Exception as e:
+                    logger.error(f"Failed to update score for {exp_id}: {str(e)}")
+                    raise HTTPException(status_code=500, detail=f"Database update failed for {exp_id}")
+                
+                results[exp_id] = {"previous_score": current_score, "new_score": new_score}
+                logger.info(f"Updated score for {exp_id}: {current_score} -> {new_score}")
+            
+            else:
+                # Record doesn't exist
+                logger.warning(f"Cannot find experiment: {exp_id}")
+                raise HTTPException(status_code=404, detail=f"Experiment {exp_id} not found")
+
+        return {
+            "status": "success",
+            "message": "Votes recorded successfully",
+            "results": results
+        }
+    
+    except HTTPException:
+        raise
+    
+    except Exception as e:
+        logger.error(f"Error recording votes: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to record votes: {str(e)}")
