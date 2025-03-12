@@ -26,10 +26,15 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
               : "i-lsicon:triangle-down-filled"
             : "i-lsicon:triangle-down-outline",
           class: "-mx-2.5",
-          onClick: () => column.toggleSorting(),
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
       ]);
+    },
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.id ?? 0;
+      const b = rowB.original.id ?? 0;
+      return a.localeCompare(b);
     },
   },
   {

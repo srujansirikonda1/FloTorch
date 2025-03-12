@@ -187,6 +187,8 @@ const { mutateAsync: getKbPresignedUrls, isPending: isFetchingKbPresignedUrls } 
       font-size: 14px !important;
       line-height: 22px !important;
       padding: 4px 20px !important;
+      width: 35%;
+      margin: 0 auto;
     }
 
     .uppy-u-reset.uppy-Dashboard-Item-action.uppy-Dashboard-Item-action--remove svg{
