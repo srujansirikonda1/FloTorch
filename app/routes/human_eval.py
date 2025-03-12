@@ -8,18 +8,18 @@ from http.client import HTTPException
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from inferencer.inferencer_provider_factory import InferencerProviderFactory
-from storage.db.vector.vector_storage_factory import VectorStorageFactory
-from embedding.embedding_registry import embedding_registry
-from storage.db.dynamodb import DynamoDB
-from config.config import Config
-from config.env_config_provider import EnvConfigProvider
-from chunking.chunking import Chunk
+from flotorch_core.inferencer.inferencer_provider_factory import InferencerProviderFactory
+from flotorch_core.storage.db.vector.vector_storage_factory import VectorStorageFactory
+from flotorch_core.embedding.embedding_registry import embedding_registry
+from flotorch_core.storage.db.dynamodb import DynamoDB
+from flotorch_core.config.config import Config
+from flotorch_core.config.env_config_provider import EnvConfigProvider
+from flotorch_core.chunking.chunking import Chunk
 
-from embedding.titanv2_embedding import TitanV2Embedding
-from embedding.titanv1_embedding import TitanV1Embedding
-from embedding.cohere_embedding import CohereEmbedding
-from embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
+from flotorch_core.embedding.titanv2_embedding import TitanV2Embedding
+from flotorch_core.embedding.titanv1_embedding import TitanV1Embedding
+from flotorch_core.embedding.cohere_embedding import CohereEmbedding
+from flotorch_core.embedding.bge_large_embedding import BGELargeEmbedding, BGEM3Embedding, GTEQwen2Embedding
 
 # Flotorch-core config
 env_config_provider = EnvConfigProvider()
