@@ -112,7 +112,7 @@ async def query_experiments(
                 opensearch_port=config.get_opensearch_port(),
                 opensearch_username=config.get_opensearch_username(),
                 opensearch_password=config.get_opensearch_password(),
-                index_id=config.get_opensearch_index(),
+                index_id=exp_config_data.get("index_id"),
                 knowledge_base_id=exp_config.get("kb_data"),
                 aws_region=aws_region
             )
