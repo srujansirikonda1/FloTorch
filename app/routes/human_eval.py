@@ -81,7 +81,7 @@ async def query_experiments(
         exp_config = exp_config_data.get("config")
 
         # Configurations
-        aws_region = exp_config.get("aws_region")
+        aws_region = exp_config.get("region")
         knowledge_base = exp_config.get("knowledge_base", False)
         bedrock_knowledge_base = exp_config.get("bedrock_knowledge_base", False)
 
@@ -123,7 +123,7 @@ async def query_experiments(
             question_chunk = Chunk(data=query.query)
 
             vector_response = await asyncio.to_thread(
-                vector_storage.search, question_chunk, exp_config['knn_num'], hierarchical
+                vector_storage.search, question_chunk, int(exp_config['knn_num']), hierarchical
             )
             vector_response = vector_response.to_json()['result']
             metadata, answer = await asyncio.to_thread(
