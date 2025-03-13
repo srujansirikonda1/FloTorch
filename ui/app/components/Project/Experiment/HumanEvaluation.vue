@@ -5,6 +5,8 @@ import { useMutation } from '@tanstack/vue-query';
 
 
 const route = useRoute()
+const loading = ref(false)
+
 
 const { mutate } = useMutation({
     mutationFn: async (data: any) => {
@@ -12,6 +14,7 @@ const { mutate } = useMutation({
     },
     onSuccess: (data) => {
         experimentsData.value = data.results
+        loading.value = false
     }
 })
 
@@ -56,15 +59,14 @@ const approveExample = (id: string) => {
   upvote(data)
 }
 
+
 const sendMessage = (e) => {
+  loading.value = true
   questionAsked.value = e.data.message
   mutate(e.data.message)
   state.message = ''
   experimentId.value = '';
-  showResponses.value = false
-  setTimeout(() => {
-    showResponses.value = true
-  }, 2500)
+  showResponses.value = true
 }
 
 
@@ -99,13 +101,24 @@ items.value = [{
         <UFormField :ui="{error: 'ml-2'}" name="message" class="w-full m-0">
           <UInput v-model="state.message" placeholder="Enter your question" class="input-box h-full m-0" :ui="{
           base: 'test h-full!'
-        }"></UInput>
+        }">
+    <template #trailing>
+        <UButton :disabled="!state.message || state.message.length < 10" class="primary-bg-color aws-font-grey-color" icon="i-lucide-send" type="submit"></UButton>
+    </template>
+    
+    </UInput>
         </UFormField>
-        <UButton :disabled="!state.message || state.message.length < 10"  class="primary-btn" icon="i-lucide-send" type="submit">Send</UButton>
 
       </UForm>
     </div>
-    <Transition name="fade">
+    <Transition v-if="loading" name="fade">
+        <div class="flex justify-center items-center h-full">
+            <UIcon name="i-lucide-loader-circle" class="animate-spin" size="120" />
+          <!-- <UProgress :ui="{track: 'bg-gray-300', filled: 'bg-primary-color'}" :value="50" /> -->
+        </div>
+    </Transition>
+    
+    <Transition v-else name="fade">
       <div v-if="questionAsked && showResponses" class="border-2 border-gray-300 rounded-md p-2 h-[70%] mt-5 pb-14 pt-3">
         <div class="flex justify-start items-center mb-5">
             <UBadge class="mr-2" variant="solid" color="neutral">
@@ -120,8 +133,8 @@ items.value = [{
                 </template>
             </UModal>
         </div>
-        <div class="flex justify-around h-full pb-5">
-          <UCard v-for="experiment in experimentsData" :key="experiment.id" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
+        <div v-if="!loading" class="flex justify-around h-full pb-5">
+          <UCard v-for="experiment in experimentsData" :key="experiment.id" class="p-4" :ui="{root:'overflow-y-auto'}" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
             <template #header>
               <div class="flex justify-between mt-2 items-start">
                 <div>
@@ -145,7 +158,7 @@ items.value = [{
               </div>
             </template>
             <template #default>
-              <div class="overflow-y-auto max-h-[400px]">
+              <div class="overflow-y-auto max-h-[400px] p-4">
                 {{ experiment.answer}}
               </div>
             </template>
