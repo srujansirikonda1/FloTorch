@@ -146,6 +146,14 @@ div.divide-y.divide-\[var\(--ui-border\)\].scroll-py-1 div[role='group'] {
   color: var(--aws-secondary-color);
 }
 
+.aws-font-grey-color {
+  color: var(--aws-font-grey-color);
+}
+
+.primary-bg-color {
+  background-color: var(--aws-primary-color);
+}
+
 .primary-btn {
   background-color: var(--aws-primary-color);
   color: var(--aws-font-grey-color);
