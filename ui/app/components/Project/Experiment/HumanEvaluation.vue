@@ -149,12 +149,12 @@ items.value = [{
                     </template>
                   </UAccordion>
                 </div>
-                <UButton v-if="experiment.experiment_id !== experimentId" class="primary-btn" @click="approveExample(experiment.experiment_id)" :disabled="experimentId !== experiment.experiment_id && experimentId !== ''">
+                <UButton v-if="experiment.experiment_id !== experimentId" class="secondary-btn-outline" @click="approveExample(experiment.experiment_id)" :disabled="experimentId !== experiment.experiment_id && experimentId !== ''">
                   <UIcon name="i-lucide-thumbs-up" />
                 </UButton>
-                <UBadge color="success" v-else>
-                  <UIcon name="i-lucide-check" />
-                </UBadge>
+                <UButton class="primary-btn" v-else>
+                  <UIcon name="i-lucide-thumbs-up" />
+                </UButton>
               </div>
             </template>
             <template #default>

@@ -27,7 +27,11 @@ watchEffect(() => {
 const columns = ref<TableColumn<ProjectExperiment>[]>([
   {
     id: 'select',
-    cell: ({ row }) => h(UCheckbox, {
+    cell: ({ row }) => {
+      if(row.original.experiment_status !== 'succeeded'){
+        return null;
+      }else {
+        return h(UCheckbox, {
       'modelValue': row.getIsSelected(),
       'onUpdate:modelValue': (value: boolean) => {
         const selectedRows = table.value?.tableApi?.getFilteredSelectedRowModel().rows ?? [];
@@ -41,8 +45,10 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
         }
         row.toggleSelected(!!value);
       },
-      'ariaLabel': 'Select row'
-    }),
+          'ariaLabel': 'Select row'
+        })
+      }
+    },
     enableHiding: false,
   },
   {
