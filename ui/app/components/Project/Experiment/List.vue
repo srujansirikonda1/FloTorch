@@ -2,6 +2,13 @@
 import type { TableColumn } from '@nuxt/ui';
 
 const UButton = resolveComponent('UButton')
+const UCheckbox = resolveComponent('UCheckbox')
+
+const toast = useToast()
+
+const modelValue = defineModel<ValidExperiment[]>()
+
+
 const props = defineProps<{
   projectId: string
   experiments: ProjectExperiment[]
@@ -9,7 +16,35 @@ const props = defineProps<{
 
 const table = useTemplateRef('table')
 
+watchEffect(() => {
+  if (table?.value?.tableApi && table.value.tableApi.getFilteredSelectedRowModel().rows) {
+    modelValue.value = table.value.tableApi.getFilteredSelectedRowModel().rows.map((row: any) => {
+      return row.original
+    })
+  }
+})
+
 const columns = ref<TableColumn<ProjectExperiment>[]>([
+  {
+    id: 'select',
+    cell: ({ row }) => h(UCheckbox, {
+      'modelValue': row.getIsSelected(),
+      'onUpdate:modelValue': (value: boolean) => {
+        const selectedRows = table.value?.tableApi?.getFilteredSelectedRowModel().rows ?? [];
+        if (value && (selectedRows.length > 2 && selectedRows.length < 3)) {
+          toast.add({
+            title: 'Min limit reached',
+            description: `You can select atleast 2 experiments and atmost 3 experiments`,
+            color: 'error'
+          })
+          return;
+        }
+        row.toggleSelected(!!value);
+      },
+      'ariaLabel': 'Select row'
+    }),
+    enableHiding: false,
+  },
   {
     header: ({ column }) => {
       const isSorted = column.getIsSorted();
@@ -721,6 +756,32 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
     accessorKey: "config.n_shot_prompts",
     label: 'N Shot Prompts',
   },
+  {
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      return h('div', { class: 'flex items-center justify-between' }, [
+        h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Scores",
+        trailingIcon: isSorted
+          ? isSorted === "asc"
+            ? "i-lsicon:triangle-up-filled"
+            : "i-lsicon:triangle-down-filled"
+          : "i-lsicon:triangle-down-outline",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      }),
+      h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
+    ]);
+    },
+    cell: ({ row }) => {
+      return 'scores' in row.original && (row.original.scores !== 0 || Object.keys(row.original.scores).length === 0) ? row.original.scores : "NA"
+    },
+    enableHiding: true,
+    accessorKey: "scores",
+    label: 'Scores',
+  },
 ])
 
 const navigateToExperiment = (experimentId: string) => {
@@ -739,6 +800,15 @@ const hasAllExperimentsCompleted = computed(() => {
 
 const openTooltipId = ref<string | null>(null)
 
+
+
+const navigateHumanEvaluation = () => {
+  const experimentIds = modelValue.value?.map(experiment => experiment.id).join(',')
+  navigateTo(`/projects/${props.projectId}/humanevaluation?experiments=${experimentIds}`);
+}
+
+
+
 const columnVisibility = ref({
   config_knn: false,
   config_n_shot_prompts: false,
@@ -753,6 +823,7 @@ const columnVisibility = ref({
   config_indexing_algorithm: false,
   config_chunking_strategy: false,
   config_embedding_model: false,
+  scores: false,
   
 })
 </script>
@@ -841,6 +912,7 @@ const columnVisibility = ref({
       </template>
     </UTable>
     <div v-if="hasAllExperimentsCompleted" class="flex justify-end">
+      <UButton :disabled="modelValue && (modelValue.length <= 1 || modelValue.length > 3)" class="secondary-btn mr-2" @click="navigateHumanEvaluation">{{modelValue && modelValue.length > 1 ? 'Human Evaluation': 'Select 2-3 experiments to enable Human Evaluation'}}</UButton>
       <DownloadResultsButton :results="experiments" :question-metrics="false" button-label="Download Results" />
     </div>
   </div>
