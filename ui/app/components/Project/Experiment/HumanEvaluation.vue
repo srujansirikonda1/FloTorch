@@ -70,7 +70,7 @@ const sendMessage = (e) => {
 }
 
 const navigateToExperiment = (experimentId: string) => {
-  window.location.href = `/projects/${route.params.id}/experiments/${experimentId}`
+  window.open(`/projects/${route.params.id}/experiments/${experimentId}`, '_blank')
 }
 
 const items = ref([]);
@@ -80,6 +80,19 @@ items.value = [{
     icon: 'i-lucide-info'
 }]
 
+const formatMetadataKey = (key: string) => {
+  return key
+    // Split by underscore and camelCase
+    .split('_')
+    .join(' ')
+    .replace(/([A-Z])/g, ' $1')
+    .toLowerCase()
+    // Capitalize first letter of each word
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+    .trim()
+}
 
 </script>
 
@@ -137,26 +150,35 @@ items.value = [{
             </UModal>
         </div>
         <div v-if="!loading" class="flex justify-around h-full pb-5">
-          <UCard v-for="experiment in experimentsData" :key="experiment.id" class="p-4" :ui="{root:'overflow-y-auto'}" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
+          <UCard v-for="experiment in experimentsData" :key="experiment.id" class="p-4 break-words" :ui="{root:'overflow-y-auto'}" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
             <template #header>
               <div class="flex justify-between mt-2 items-start">
                 <div>
-                  <UBadge>
+                  <div class="flex flex-col items-baseline gap-2">
+                    <UBadge color="primary" variant="solid">
+                      {{ useGetModelData('retrieval', experiment.inference_model)?.label }}
+                    </UBadge>
+                  <UBadge variant="outline" class="mr-3">
                     <p>{{ experiment.experiment_id }}</p>
                   </UBadge>
+                  </div>
+                 
                   <UAccordion :items="items">
                     <template #body="{ item }">
                       <div>
                         <div class="" v-for="(value, key) in experiment.metadata">
-                          <strong>{{ key }}:</strong> {{ value }}
+                          <strong>{{ formatMetadataKey(key) }}:</strong> {{ value }}
                       </div>
-                      <a
-                      href="#"
-        @click="navigateToExperiment(experiment.experiment_id)"
-        class="text-blue-500 hover:underline"
-      >
-        Go to experiment details
-      </a>
+                      <strong>Temperature:</strong> {{ experiment.temperature }}
+                      <p>
+                          <a
+                            href="#"
+                            @click="navigateToExperiment(experiment.experiment_id)"
+                            class="text-blue-500 hover:underline"
+                          >
+                            Go to experiment details
+                          </a>
+                      </p>
                       </div>
                       
                     </template>
