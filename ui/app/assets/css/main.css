@@ -196,6 +196,21 @@ div.divide-y.divide-\[var\(--ui-border\)\].scroll-py-1 div[role='group'] {
   border-color: var(--aws-secondary-hover-font-color);
 }
 
+.secondary-btn-outline {
+  background-color: grey;
+  color: white;
+  border-color: grey;
+  border-width: 2px;
+  border-end-start-radius: 20px;
+  border-end-end-radius: 20px;
+  border-start-start-radius: 20px;
+  border-start-end-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 4px 20px;
+}
+
 .aws-font-grey {
   color: var(--aws-font-grey-color);
 }

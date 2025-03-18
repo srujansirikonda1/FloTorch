@@ -27,7 +27,11 @@ watchEffect(() => {
 const columns = ref<TableColumn<ProjectExperiment>[]>([
   {
     id: 'select',
-    cell: ({ row }) => h(UCheckbox, {
+    cell: ({ row }) => {
+      if(row.original.experiment_status !== 'succeeded'){
+        return null;
+      }else {
+        return h(UCheckbox, {
       'modelValue': row.getIsSelected(),
       'onUpdate:modelValue': (value: boolean) => {
         const selectedRows = table.value?.tableApi?.getFilteredSelectedRowModel().rows ?? [];
@@ -41,8 +45,10 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
         }
         row.toggleSelected(!!value);
       },
-      'ariaLabel': 'Select row'
-    }),
+          'ariaLabel': 'Select row'
+        })
+      }
+    },
     enableHiding: false,
   },
   {
@@ -912,7 +918,7 @@ const columnVisibility = ref({
       </template>
     </UTable>
     <div v-if="hasAllExperimentsCompleted" class="flex justify-end">
-      <UButton :disabled="modelValue && (modelValue.length <= 1 || modelValue.length > 3)" class="secondary-btn mr-2" @click="navigateHumanEvaluation">{{modelValue && modelValue.length > 1 ? 'Human Evaluation': 'Select 2-3 experiments to enable Human Evaluation'}}</UButton>
+      <UButton :disabled="modelValue && (modelValue.length <= 1 || modelValue.length > 3)" class="secondary-btn mr-2" @click="navigateHumanEvaluation">{{modelValue && modelValue.length > 1 ? 'Human Evaluation': 'Choose 2-3 experiments for Human Evaluation'}}</UButton>
       <DownloadResultsButton :results="experiments" :question-metrics="false" button-label="Download Results" />
     </div>
   </div>

@@ -69,6 +69,9 @@ const sendMessage = (e) => {
   showResponses.value = true
 }
 
+const navigateToExperiment = (experimentId: string) => {
+  window.open(`/projects/${route.params.id}/experiments/${experimentId}`, '_blank')
+}
 
 const items = ref([]);
 
@@ -77,6 +80,19 @@ items.value = [{
     icon: 'i-lucide-info'
 }]
 
+const formatMetadataKey = (key: string) => {
+  return key
+    // Split by underscore and camelCase
+    .split('_')
+    .join(' ')
+    .replace(/([A-Z])/g, ' $1')
+    .toLowerCase()
+    // Capitalize first letter of each word
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+    .trim()
+}
 
 </script>
 
@@ -134,31 +150,50 @@ items.value = [{
             </UModal>
         </div>
         <div v-if="!loading" class="flex justify-around h-full pb-5">
-          <UCard v-for="experiment in experimentsData" :key="experiment.id" class="p-4" :ui="{root:'overflow-y-auto'}" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
+          <UCard v-for="experiment in experimentsData" :key="experiment.id" class="p-4 break-words" :ui="{root:'overflow-y-auto'}" :class="{'w-[30%]': experimentsData.length === 3, 'w-[45%]': experimentsData.length === 2}">
             <template #header>
               <div class="flex justify-between mt-2 items-start">
                 <div>
-                  <UBadge>
+                  <div class="flex flex-col items-baseline gap-2">
+                    <UBadge color="primary" variant="solid">
+                      {{ useGetModelData('retrieval', experiment.inference_model)?.label }}
+                    </UBadge>
+                  <UBadge variant="outline" class="mr-3">
                     <p>{{ experiment.experiment_id }}</p>
                   </UBadge>
+                  </div>
+                 
                   <UAccordion :items="items">
                     <template #body="{ item }">
-                      <div class="overflow-y-auto max-h-[100px] scrollbar-hide" v-for="(value, key) in experiment.metadata">
-                          <strong>{{ key }}:</strong> {{ value }}
+                      <div>
+                        <div class="" v-for="(value, key) in experiment.metadata">
+                          <strong>{{ formatMetadataKey(key) }}:</strong> {{ value }}
                       </div>
+                      <strong>Temperature:</strong> {{ experiment.temperature }}
+                      <p>
+                          <a
+                            href="#"
+                            @click="navigateToExperiment(experiment.experiment_id)"
+                            class="text-blue-500 hover:underline"
+                          >
+                            Go to experiment details
+                          </a>
+                      </p>
+                      </div>
+                      
                     </template>
                   </UAccordion>
                 </div>
-                <UButton v-if="experiment.experiment_id !== experimentId" class="primary-btn" @click="approveExample(experiment.experiment_id)" :disabled="experimentId !== experiment.experiment_id && experimentId !== ''">
+                <UButton v-if="experiment.experiment_id !== experimentId" class="secondary-btn-outline" @click="approveExample(experiment.experiment_id)" :disabled="experimentId !== experiment.experiment_id && experimentId !== ''">
                   <UIcon name="i-lucide-thumbs-up" />
                 </UButton>
-                <UBadge color="success" v-else>
-                  <UIcon name="i-lucide-check" />
-                </UBadge>
+                <UButton class="primary-btn" v-else>
+                  <UIcon name="i-lucide-thumbs-up" />
+                </UButton>
               </div>
             </template>
             <template #default>
-              <div class="overflow-y-auto max-h-[400px] p-4">
+              <div class="max-h-[400px] p-4">
                 {{ experiment.answer}}
               </div>
             </template>

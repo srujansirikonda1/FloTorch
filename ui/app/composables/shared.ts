@@ -702,7 +702,14 @@ export const useProjectUploadConfig = () => {
         gt_data: undefined,
       },
       indexing: {
-        ...config.indexing,
+        vector_dimension: config.indexing?.vector_dimension,
+        indexing_algorithm: config.indexing?.indexing_algorithm,
+        chunking_strategy: config.indexing?.chunking_strategy,
+        ...(config.indexing?.chunking_strategy.includes('fixed') && config.indexing?.chunk_size.length > 0 ? { chunk_size: config.indexing?.chunk_size} : {}),
+        ...(config.indexing?.chunking_strategy.includes('fixed') && config.indexing?.chunk_overlap.length > 0 ? { chunk_overlap: config.indexing?.chunk_overlap} : {}),
+        ...(config.indexing?.chunking_strategy.includes('hierarchical') && config.indexing?.hierarchical_parent_chunk_size.length > 0 ? { hierarchical_parent_chunk_size: config.indexing?.hierarchical_parent_chunk_size} : {}),
+        ...(config.indexing?.chunking_strategy.includes('hierarchical') && config.indexing?.hierarchical_child_chunk_size.length > 0 ? { hierarchical_child_chunk_size: config.indexing?.hierarchical_child_chunk_size} : {}),
+        ...(config.indexing?.chunking_strategy.includes('hierarchical') && config.indexing?.hierarchical_chunk_overlap_percentage.length > 0 ? { hierarchical_chunk_overlap_percentage: config.indexing?.hierarchical_chunk_overlap_percentage} : {}),
         embedding: config.indexing?.embedding?.map((pc: any) => {
           return useGetModelData("indexing", pc.model);
         }),
