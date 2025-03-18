@@ -382,6 +382,11 @@ export const useProjectCreateMeta = () => {
           service: "bedrock",
         },
         {
+          label: "Anthropic/us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+          value: "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+          service: "bedrock",
+        },
+        {
           type: "label",
           label: "SageMaker (Provisioned)",
         },
