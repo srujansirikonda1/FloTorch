@@ -156,7 +156,8 @@ model_list = ["mistral.mistral-7b-instruct-v0:2",
               "amazon.titan-text-lite-v1",
               "us.amazon.nova-lite-v1:0",
               "us.amazon.nova-micro-v1:0",
-              "us.amazon.nova-pro-v1:0"
+              "us.amazon.nova-pro-v1:0",
+              "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
               ]
 
 for model in model_list:
