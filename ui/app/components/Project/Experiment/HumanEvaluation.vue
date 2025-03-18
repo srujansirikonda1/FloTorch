@@ -69,6 +69,9 @@ const sendMessage = (e) => {
   showResponses.value = true
 }
 
+const navigateToExperiment = (experimentId: string) => {
+  window.location.href = `/projects/${route.params.id}/experiments/${experimentId}`
+}
 
 const items = ref([]);
 
@@ -143,9 +146,19 @@ items.value = [{
                   </UBadge>
                   <UAccordion :items="items">
                     <template #body="{ item }">
-                      <div class="overflow-y-auto max-h-[100px] scrollbar-hide" v-for="(value, key) in experiment.metadata">
+                      <div>
+                        <div class="" v-for="(value, key) in experiment.metadata">
                           <strong>{{ key }}:</strong> {{ value }}
                       </div>
+                      <a
+                      href="#"
+        @click="navigateToExperiment(experiment.experiment_id)"
+        class="text-blue-500 hover:underline"
+      >
+        Go to experiment details
+      </a>
+                      </div>
+                      
                     </template>
                   </UAccordion>
                 </div>
@@ -158,7 +171,7 @@ items.value = [{
               </div>
             </template>
             <template #default>
-              <div class="overflow-y-auto max-h-[400px] p-4">
+              <div class="max-h-[400px] p-4">
                 {{ experiment.answer}}
               </div>
             </template>
