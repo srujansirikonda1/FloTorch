@@ -106,7 +106,7 @@ const formatMetadataKey = (key: string) => {
       </UButton>
     </div>
     <div :class="[
-      'border-2 border-gray-300 rounded-md p-2 h-[15%] mt-5 transition-all duration-500',
+      'border-2 border-gray-300 rounded-md p-2 h-[120px] mt-5 transition-all duration-500',
       {
         'transform translate-y-0 relative top-[30%]': !questionAsked,
         'transform relative top-[0%]': questionAsked,
@@ -167,10 +167,16 @@ const formatMetadataKey = (key: string) => {
                     <template #body="{ item }">
                       <div>
                         <div class="" v-for="(value, key) in experiment.metadata">
-                          <strong>{{ formatMetadataKey(key) }}:</strong> {{ value }}
-                      </div>
-                      <strong>Temperature:</strong> {{ experiment.temperature }}
-                      <p>
+                          <strong>{{ formatMetadataKey(key) }}: </strong> 
+                          <span v-if="formatMetadataKey(key).toLowerCase().includes('price')">
+                            {{ useHumanCurrencyAmount(value) }}
+                          </span>
+                          <span v-else>
+                            {{ value }}
+                          </span>
+                        </div>
+                        <strong>Temperature:</strong> {{ experiment.temperature }}
+                        <p>
                           <a
                             href="#"
                             @click="navigateToExperiment(experiment.experiment_id)"
@@ -178,7 +184,7 @@ const formatMetadataKey = (key: string) => {
                           >
                             Go to experiment details
                           </a>
-                      </p>
+                        </p>
                       </div>
                       
                     </template>
