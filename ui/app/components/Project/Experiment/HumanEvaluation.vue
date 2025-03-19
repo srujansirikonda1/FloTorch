@@ -154,7 +154,7 @@ const formatMetadataKey = (key: string) => {
             <template #header>
               <div class="flex justify-between mt-2 items-start">
                 <div>
-                  <div class="flex flex-col items-baseline gap-2">
+                  <div class="flex flex-col items-baseline gap-2 max-w-[250px]">
                     <UBadge color="primary" variant="solid">
                       {{ useGetModelData('retrieval', experiment.inference_model)?.label }}
                     </UBadge>
@@ -168,7 +168,10 @@ const formatMetadataKey = (key: string) => {
                       <div>
                         <div class="" v-for="(value, key) in experiment.metadata">
                           <strong>{{ formatMetadataKey(key) }}: </strong> 
-                          <span v-if="formatMetadataKey(key).toLowerCase().includes('price')">
+                          <span v-if="formatMetadataKey(key).toLowerCase() === 'total token price'">
+                            ${{ value }}
+                          </span>
+                          <span v-else-if="formatMetadataKey(key).toLowerCase() === 'million question price'">
                             {{ useHumanCurrencyAmount(value) }}
                           </span>
                           <span v-else>
@@ -186,7 +189,6 @@ const formatMetadataKey = (key: string) => {
                           </a>
                         </p>
                       </div>
-                      
                     </template>
                   </UAccordion>
                 </div>

@@ -64,7 +64,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -92,7 +92,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       }),
       h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -115,7 +115,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -146,7 +146,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -177,7 +177,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -228,7 +228,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -277,7 +277,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -322,7 +322,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -367,7 +367,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -398,7 +398,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -424,7 +424,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -455,7 +455,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -486,7 +486,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -517,7 +517,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -548,7 +548,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -574,7 +574,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -600,7 +600,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -628,7 +628,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -659,7 +659,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -690,7 +690,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -721,7 +721,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -752,7 +752,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       }),
       h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -775,7 +775,7 @@ const columns = ref<TableColumn<ProjectExperiment>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+     class: "-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       }),
       h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -832,6 +832,15 @@ const columnVisibility = ref({
   scores: false,
   
 })
+
+const sorting = ref([
+  {
+    id: "id",
+    asc: true,
+  },
+]);
+
+
 </script>
 
 <template>
@@ -856,7 +865,7 @@ const columnVisibility = ref({
         <UButton label="Columns" color="neutral" variant="outline" trailing-icon="i-lucide-chevron-down" />
       </UDropdownMenu>
     </div>
-    <UTable class="h-100" sticky v-model:column-visibility="columnVisibility" ref="table" :columns="columns" :data="experiments">
+    <UTable class="h-100" sticky v-model:column-visibility="columnVisibility" v-model:sorting="sorting" ref="table" :columns="columns" :data="experiments">
        <template #empty>
         <div  class="flex flex-col items-center justify-center py-6">
           <p class="text-gray-500">No experiments found...!</p>
@@ -865,7 +874,7 @@ const columnVisibility = ref({
       <template #id-cell="{ row }">
         <a 
           href="#"
-          class="text-blue-500 hover:underline"
+          class="text-blue-500 hover:text-black hover:underline"
           @click.prevent="navigateToExperiment(row.original.id)"
         >
           {{ row.original.id }}

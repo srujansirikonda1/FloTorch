@@ -25,7 +25,7 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
               ? "i-lsicon:triangle-up-filled"
               : "i-lsicon:triangle-down-filled"
             : "i-lsicon:triangle-down-outline",
-          class: "-mx-2.5",
+         class:"-mx-2.5 focus:font-bold hover:font-bold",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -54,7 +54,7 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+       class:"-mx-2.5 focus:font-bold hover:font-bold",
           onClick: () => column.toggleSorting(),
         }),
         h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -84,7 +84,7 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+       class:"-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(),
       }),
       h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -108,7 +108,7 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+       class:"-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(),
       }),
       h('div', { class: 'h-5 w-[2px] bg-gray-200 dark:bg-gray-700 ml-2' })
@@ -131,7 +131,7 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
             ? "i-lsicon:triangle-up-filled"
             : "i-lsicon:triangle-down-filled"
           : "i-lsicon:triangle-down-outline",
-        class: "-mx-2.5",
+       class:"-mx-2.5 focus:font-bold hover:font-bold",
         onClick: () => column.toggleSorting(),
       });
     },
@@ -140,8 +140,8 @@ const columns = ref<TableColumn<ProjectListItem>[]>([
 
 const sorting = ref([
   {
-    id: "date",
-    desc: true,
+    id: "id",
+    asc: true,
   },
 ]);
 </script>
@@ -151,7 +151,7 @@ const sorting = ref([
     <template #id-cell="{ row }">
       <NuxtLink
         :to="{ name: 'projects-id', params: { id: row.original.id } }"
-        class="text-blue-500 hover:underline"
+        class="text-blue-500 hover:text-black hover:underline"
       >
         {{ row.original.id }}
       </NuxtLink>
