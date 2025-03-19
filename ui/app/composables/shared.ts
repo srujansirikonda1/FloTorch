@@ -759,7 +759,7 @@ export const useProjectBadgeIcon = (status: ProjectStatus) => {
   if (status === "in_progress") {
     return "i-lucide-circle-ellipsis";
   } else if (status === "completed") {
-    return "i-lucide-circle-check";
+    return "i-rivet-icons:check-circle";
   } else if (status === "not_started") {
     return "i-lucide-clock-9";
   } else if (status === "failed") {
@@ -809,7 +809,7 @@ export const useExperimentBadgeIcon = (status: ProjectExperimentStatus) => {
   if (status === "indexing_inprogress" || status === "retrieval_inprogress" || status === "eval_inprogress" || status === "in_progress") {
     return "i-lucide-circle-ellipsis";
   } else if (status === "indexing_completed" || status === "retrieval_completed" || status === "succeeded") {
-    return "i-lucide-circle-check";
+    return "i-rivet-icons:check-circle";
   } else if (status === "failed") {
     return "i-lucide-circle-x";
   }

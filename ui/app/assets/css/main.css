@@ -94,6 +94,7 @@ td {
   color: var(--aws-secondary-color);
   margin-bottom: 10px;
   cursor: pointer;
+  
 
 }
 .experiment-details-tabs div button:last-child {
@@ -188,6 +189,10 @@ div.divide-y.divide-\[var\(--ui-border\)\].scroll-py-1 div[role='group'] {
   line-height: 22px;
   padding: 4px 20px;
 
+}
+
+.reduced-secondary-btn{
+  padding: 4px 16px;
 }
 
 .secondary-btn:hover {
@@ -329,6 +334,7 @@ input, .primary-dropdown {
   border-bottom: 1px solid lightgray;
   margin-bottom: 0px !important;
   padding: 2px;
+  
   
 }
 
